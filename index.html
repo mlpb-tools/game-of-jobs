@@ -1,481 +1,596 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Serious Game – Forum Mission Locale</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Serious Game – Forum Mission Locale</title>
+<style>
+  /* ——— FONTS (brancher vos WOFF2 au besoin) ——— */
+  @font-face{font-family:"Politica";src:local("Politica"),local("Politica-Bold");font-weight:700;font-style:normal;font-display:swap}
+  @font-face{font-family:"Muli";src:local("Muli"),local("Mulish Regular");font-weight:400;font-style:normal;font-display:swap}
+  @font-face{font-family:"Akrobat";src:local("Akrobat"),local("Akrobat Bold");font-weight:700;font-style:normal;font-display:swap}
 
-  <!-- POLICES : remplace les src: url(... .woff2) par tes fichiers si tu les as -->
-  <style>
-    /* ——— FONTS ——— */
-    @font-face {
-      font-family: "Politica";
-      src: local("Politica"), local("Politica-Bold");
-      font-weight: 700; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: "Muli";
-      src: local("Muli"), local("Mulish Regular");
-      font-weight: 400; font-style: normal; font-display: swap;
-    }
-    @font-face {
-      font-family: "Akrobat";
-      src: local("Akrobat"), local("Akrobat Bold");
-      font-weight: 700; font-style: normal; font-display: swap;
-    }
+  :root{
+    --orange:#f39200; --green:#95c11f; --blue:#2897d5; --pink:#d60b52;
+    --violet:#a3195b; --brick:#9f3d3f; --ink:#171718;
+    --card:#ffffff; --line:#e6e8ee; --muted:#5a6473; --bg:#f8fafc; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Muli",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
 
-    :root{
-      /* Palette officielle */
-      --orange:#f39200; --green:#95c11f; --blue:#2897d5; --pink:#d60b52;
-      --violet:#a3195b; --brick:#9f3d3f; --ink:#171718;
-      /* UI */
-      --card:#ffffff; --line:#e6e8ee; --muted:#5a6473; --bg:#f8fafc;
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; background:var(--bg); color:var(--ink);
-      font-family:"Muli", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
+  /* HEADER */
+  .brandbar{background:linear-gradient(135deg,var(--orange),var(--green) 35%,var(--blue));color:#fff;padding:18px 16px;text-align:center;box-shadow:inset 0 -8px 0 rgba(0,0,0,.08)}
+  .brandbar .title{margin:0;font:700 28px/1.1 "Politica","Muli",sans-serif;letter-spacing:.5px}
+  .brandbar .subtitle{margin:6px 0 0;opacity:.95;font-weight:600}
 
-    /* ——— HEADER ——— */
-    .brandbar{
-      background:
-        linear-gradient(135deg, var(--orange), var(--green) 35%, var(--blue));
-      color:#fff; padding:18px 16px; text-align:center; position:relative;
-      box-shadow: inset 0 -8px 0 rgba(0,0,0,.08);
-    }
-    .brandbar .title{
-      margin:0; font: 700 28px/1.1 "Politica", "Muli", sans-serif; letter-spacing:.5px;
-      text-shadow: 0 1px 0 rgba(0,0,0,.25);
-    }
-    .brandbar .subtitle{
-      margin:6px 0 0; opacity:.95; font-weight:600;
-    }
+  /* LAYOUT */
+  .container{max-width:1100px;margin:24px auto 120px;padding:0 16px}
+  .page{display:none}
+  .page.active{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.04)}
 
-    /* ——— CONTAINER ——— */
-    .container{max-width:1100px; margin:24px auto 120px; padding:0 16px}
-    .page{display:none}
-    .page.active{display:block}
-    .card{
-      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
-      padding:20px; box-shadow: 0 8px 24px rgba(0,0,0,.04);
-    }
+  /* FRIZE / progression */
+  .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}
+  .step{position:relative;padding:12px;border-radius:12px;text-align:center;background:#fff;border:2px solid var(--line);font-weight:800}
+  .step[data-status="done"]{border-color:var(--green);box-shadow:0 0 0 4px rgba(149,193,31,.15) inset}
+  .step[data-status="curr"]{border-color:var(--blue);box-shadow:0 0 0 4px rgba(40,151,213,.15) inset}
+  .step .k{display:block;font-family:"Akrobat","Muli",sans-serif;font-size:22px}
 
-    /* ——— FRise / Progression ——— */
-    .timeline{
-      display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0;
-    }
-    .step{
-      position:relative; padding:12px; border-radius:12px; text-align:center;
-      background:#fff; border:2px solid var(--line);
-      font-weight:800;
-    }
-    .step[data-status="done"]{ border-color:var(--green); box-shadow:0 0 0 4px rgba(149,193,31,.15) inset}
-    .step[data-status="curr"]{ border-color:var(--blue); box-shadow:0 0 0 4px rgba(40,151,213,.15) inset}
-    .step .k{display:block; font-family:"Akrobat","Muli",sans-serif; font-size:22px}
+  /* IDENTITÉ */
+  .id-row{display:flex;gap:12px;flex-wrap:wrap}
+  .id-row input,.id-row textarea{flex:1 1 240px;padding:12px 14px;border:2px solid var(--line);border-radius:12px;font-size:16px;outline:none}
+  .id-row input:focus,.id-row textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(40,151,213,.15)}
+  textarea{min-height:90px;resize:vertical}
 
-    /* ——— IDENTITÉ ——— */
-    .id-row{display:flex; gap:12px; flex-wrap:wrap}
-    .id-row input{
-      flex:1 1 240px; padding:12px 14px; border:2px solid var(--line); border-radius:12px; font-size:16px;
-      outline:none;
-    }
-    .id-row input:focus{border-color:var(--blue); box-shadow:0 0 0 4px rgba(40,151,213,.15)}
+  /* BOUTONS */
+  .btn{appearance:none;border:none;cursor:pointer;color:#fff;padding:12px 16px;border-radius:12px;font:800 14px/1 "Muli",sans-serif;letter-spacing:.3px;background:linear-gradient(135deg,var(--blue),var(--green));box-shadow:0 6px 0 #1a365d;transition:transform .15s ease,filter .15s ease}
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+  .btn.secondary{background:linear-gradient(135deg,var(--orange),var(--pink));box-shadow:0 6px 0 #7a1a1f}
+  .btn.dark{background:linear-gradient(135deg,#2d3748,#1a365d);box-shadow:0 6px 0 #0b203a}
+  .btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+  .btn.small{padding:8px 10px;border-radius:10px;font-weight:800}
+  .btn.icon{display:inline-flex;align-items:center;gap:6px}
 
-    /* ——— BOUTONS ——— */
-    .btn{
-      appearance:none; border:none; cursor:pointer; color:#fff; padding:14px 18px; border-radius:12px;
-      font:800 14px/1 "Muli",sans-serif; letter-spacing:.3px;
-      background:linear-gradient(135deg, var(--blue), var(--green)); box-shadow:0 6px 0 #1a365d;
-      transition:transform .15s ease, filter .15s ease;
-    }
-    .btn:hover{transform:translateY(-1px); filter:brightness(1.05)}
-    .btn.secondary{background:linear-gradient(135deg, var(--orange), var(--pink)); box-shadow:0 6px 0 #7a1a1f}
-    .btn.dark{background:linear-gradient(135deg, #2d3748, #1a365d); box-shadow:0 6px 0 #0b203a}
-    .btn.ghost{
-      background:#fff; color:var(--ink); border:2px solid var(--line); box-shadow:none;
-    }
+  /* SECTEURS / ENTREPRISES */
+  .sectors{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .sector{border-radius:16px;padding:18px;background:linear-gradient(135deg,rgba(149,193,31,.12),rgba(40,151,213,.10));border:2px solid var(--green);cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
+  .sector:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(0,0,0,.10)}
+  .sector h3{margin:0 0 6px 0;font:700 18px/1.2 "Politica","Muli",sans-serif}
+  .sector .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .sector .del{margin-left:auto}
+  .company{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;position:relative}
+  .company .name{font-weight:900;color:var(--green)}
+  .company .del{position:absolute;top:8px;right:8px}
+  .jobs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .job{background:var(--blue);color:#fff;border:none;padding:4px 10px;border-radius:999px;font-size:12px;cursor:pointer}
 
-    /* ——— SECTEURS / PARCOURS ——— */
-    .sectors{display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr))}
-    .sector{
-      border-radius:16px; padding:18px;
-      background:linear-gradient(135deg, rgba(149,193,31,.12), rgba(40,151,213,.10));
-      border:2px solid var(--green); cursor:pointer; transition:transform .2s ease, box-shadow .2s ease;
-    }
-    .sector:hover{transform:translateY(-3px); box-shadow:0 10px 20px rgba(0,0,0,.10)}
-    .sector h3{margin:0 0 6px 0; font:700 18px/1.2 "Politica","Muli",sans-serif}
-    .company{background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:10px}
-    .company .name{font-weight:900; color:var(--green)}
-    .jobs{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
-    .job{background:var(--blue); color:#fff; border:none; padding:4px 10px; border-radius:999px; font-size:12px; cursor:pointer}
+  /* BADGES & GAMIFICATION */
+  .gamif-grid{display:grid;gap:16px;grid-template-columns:2fr 1fr}
+  @media (max-width:960px){.gamif-grid{grid-template-columns:1fr}}
+  .badges{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .badge{background:linear-gradient(135deg,rgba(243,146,0,.14),rgba(163,25,91,.10));border:2px solid var(--orange);border-radius:16px;padding:18px;text-align:center}
+  .badge .em{font-size:36px}
+  .badge .title{margin:.5rem 0 0;font:700 18px/1 "Akrobat","Muli",sans-serif}
+  .badge .desc{opacity:.9}
+  .badge .count{margin-top:8px;font:900 18px/1 "Akrobat","Muli",sans-serif}
+  .badge.earned{border-color:var(--green);box-shadow:0 0 0 4px rgba(149,193,31,.2) inset}
 
-    /* ——— BADGES ——— */
-    .badges{display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))}
-    .badge{
-      background:linear-gradient(135deg, rgba(243,146,0,.14), rgba(163,25,91,.10));
-      border:2px solid var(--orange); border-radius:16px; padding:18px; text-align:center
-    }
-    .badge .em{font-size:36px}
-    .badge .title{margin:.5rem 0 0; font:700 18px/1 "Akrobat","Muli",sans-serif}
-    .badge .desc{opacity:.9}
-    .badge .count{margin-top:8px; font:900 18px/1 "Akrobat","Muli",sans-serif}
-    .badge.earned{border-color:var(--green); box-shadow:0 0 0 4px rgba(149,193,31,.2) inset}
+  .levels .level{border-left:6px solid var(--blue);background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+  .scorebox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .scorebox .big{font:900 34px/1 "Akrobat","Muli",sans-serif}
+  .rank{font:700 16px/1 "Akrobat","Muli",sans-serif;color:var(--violet)}
+  .progress{height:10px;background:#e9eef5;border-radius:999px;overflow:hidden}
+  .progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--orange));width:0%}
 
-    /* ——— STATS ——— */
-    .stats{display:grid; gap:12px; grid-template-columns: repeat(4, minmax(0,1fr))}
-    @media (max-width:900px){.stats{grid-template-columns: repeat(2, minmax(0,1fr))}}
-    .stat{
-      background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; text-align:center
-    }
-    .stat .num{font:900 30px/1 "Akrobat","Muli",sans-serif}
+  /* ECO CHALLENGE */
+  .eco{display:grid;gap:10px;grid-template-columns:repeat(2,1fr)}
+  @media (max-width:720px){.eco{grid-template-columns:1fr}}
+  .eco .tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+  .eco .big{font:900 28px/1 "Akrobat","Muli",sans-serif}
 
-    /* ——— NAV ——— */
-    .nav{
-      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
-      display:flex; gap:10px; z-index:1000;
-      background:#fff; border:1px solid var(--line); border-radius:14px; padding:8px;
-      box-shadow:0 10px 24px rgba(0,0,0,.08);
-    }
-    .nav button{
-      width:52px; height:52px; border-radius:12px; border:3px solid #1a365d;
-      background:linear-gradient(135deg, #2d3748, #1a365d); color:#fff; font:900 1rem/1 "Akrobat",sans-serif;
-      cursor:pointer; transition:all .15s ease;
-      box-shadow: inset 2px 2px 0 rgba(255,255,255,.15), inset -2px -2px 0 rgba(0,0,0,.45), 4px 4px 0 #2897d5;
-    }
-    .nav button:hover{background:linear-gradient(135deg, var(--blue), var(--green)); transform:rotate(-6deg) scale(1.06)}
-    .nav button[aria-current="page"]{background:linear-gradient(135deg, var(--orange), var(--pink));}
+  /* STATS */
+  .stats{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr))}
+  @media (max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center}
+  .stat .num{font:900 30px/1 "Akrobat","Muli",sans-serif}
 
-    /* ——— TOAST ——— */
-    .notice{
-      position:fixed; top:20px; left:50%; transform:translateX(-50%);
-      max-width:480px; padding:14px 16px; border-radius:12px; color:#fff; background:var(--blue);
-      border:2px solid #1a365d; font-weight:700; text-align:center; box-shadow:0 12px 24px rgba(0,0,0,.2); z-index:2000; white-space:pre-line;
-      display:none;
-    }
-    .notice.ok{background:var(--green)} .notice.warn{background:var(--orange)} .notice.err{background:var(--pink)}
+  /* NAV */
+  .nav{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:flex;gap:10px;z-index:1000;background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;box-shadow:0 10px 24px rgba(0,0,0,.08)}
+  .nav button{width:52px;height:52px;border-radius:12px;border:3px solid #1a365d;background:linear-gradient(135deg,#2d3748,#1a365d);color:#fff;font:900 1rem/1 "Akrobat",sans-serif;cursor:pointer;transition:all .15s ease;box-shadow:inset 2px 2px 0 rgba(255,255,255,.15),inset -2px -2px 0 rgba(0,0,0,.45),4px 4px 0 #2897d5}
+  .nav button:hover{background:linear-gradient(135deg,var(--blue),var(--green));transform:rotate(-6deg) scale(1.06)}
+  .nav button[aria-current="page"]{background:linear-gradient(135deg,var(--orange),var(--pink))}
 
-    /* ——— PRINT (Page 5) ——— */
-    @media print {
-      body{background:#fff}
-      .nav, .brandbar{display:none !important}
-      .container > * {display:none !important}
-      #page5{display:block !important}
-      #reportCanvas, #reportVisual{break-inside:avoid}
-      .page-title, .page-subtitle{color:#000}
-    }
-  </style>
+  /* TOAST */
+  .notice{position:fixed;top:20px;left:50%;transform:translateX(-50%);max-width:520px;padding:14px 16px;border-radius:12px;color:#fff;background:var(--blue);border:2px solid #1a365d;font-weight:700;text-align:center;box-shadow:0 12px 24px rgba(0,0,0,.2);z-index:2000;white-space:pre-line;display:none}
+  .notice.ok{background:var(--green)} .notice.warn{background:var(--orange)} .notice.err{background:var(--pink)}
+
+  /* PRINT PAGE 5 */
+  @media print{
+    body{background:#fff}
+    .nav,.brandbar{display:none!important}
+    .container>*{display:none!important}
+    #page5{display:block!important}
+    #reportVisual{break-inside:avoid}
+  }
+</style>
 </head>
 <body>
-  <header class="brandbar">
-    <h1 class="title">Serious Game – Forum Mission Locale</h1>
-    <p class="subtitle">Orientation • Découverte • Challenge — Ton parcours vers l’emploi</p>
-  </header>
+<header class="brandbar">
+  <h1 class="title">Serious Game – Forum Mission Locale</h1>
+  <p class="subtitle">Orientation • Découverte • Challenge — Ton parcours vers l’emploi</p>
+</header>
 
-  <main class="container">
+<main class="container">
+  <!-- PAGE 1 — INTRO + IDENTITÉ + QUESTIONS -->
+  <section class="page active" id="page1" aria-labelledby="t1">
+    <div class="card">
+      <h2 id="t1" style="font:700 26px/1.2 'Politica','Muli',sans-serif;margin:0 0 6px">🎮 Objectif du jeu</h2>
+      <p style="margin:0 0 14px;color:var(--muted)">Parcours les stands, découvre des métiers, crée des contacts et <strong>gagne des badges</strong>. Reviens au QG pour ton <strong>bilan visuel</strong>.</p>
 
-    <!-- PAGE 1 — INTRO + IDENTITÉ (Sans bouton logo/nom) -->
-    <section class="page active" id="page1" aria-labelledby="t1">
-      <div class="card">
-        <h2 id="t1" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
-          🎮 Objectif du jeu
-        </h2>
-        <p class="page-subtitle" style="margin:0 0 14px; color:var(--muted)">
-          Parcours les stands, découvre des métiers, crée des contacts et **gagne des badges**. Reviens au QG pour ton **bilan visuel**.
-        </p>
-
-        <div class="timeline">
-          <div class="step" data-status="curr"><span class="k">1</span>Identification</div>
-          <div class="step"><span class="k">2</span>Explorer</div>
-          <div class="step"><span class="k">3</span>Valider</div>
-          <div class="step"><span class="k">4</span>Bilan</div>
-        </div>
-
-        <div class="id-row">
-          <input id="firstName" placeholder="Prénom" autocomplete="given-name" />
-          <input id="lastName" placeholder="Nom" autocomplete="family-name" />
-          <button class="btn" id="btnIdentify" type="button" title="Valider l'identité">Je démarre la mission</button>
-        </div>
+      <div class="timeline">
+        <div class="step" data-status="curr"><span class="k">1</span>Identification</div>
+        <div class="step"><span class="k">2</span>Explorer</div>
+        <div class="step"><span class="k">3</span>Valider</div>
+        <div class="step"><span class="k">4</span>Bilan</div>
       </div>
 
-      <div style="display:grid; gap:14px; grid-template-columns:1.2fr .8fr; margin-top:14px">
-        <div class="card">
-          <h3 style="margin:0 0 6px; font:700 20px/1 'Politica','Muli',sans-serif; color:var(--ink)">Règles du jeu</h3>
-          <ul style="margin:8px 0 0 18px; line-height:1.5">
-            <li>Visiter **au moins 3 secteurs**.</li>
-            <li>Établir **5 contacts** entreprise.</li>
-            <li>Retourner au **QG** pour valider tes **badges**.</li>
-            <li>Exporter ton **bilan visuel** (PDF) en Page 5.</li>
-          </ul>
-        </div>
-        <div class="card" style="border-left:6px solid var(--blue)">
-          <h3 style="margin:0 0 6px; font:700 20px/1 'Politica','Muli',sans-serif; color:var(--ink)">Conseil Mission Locale</h3>
-          <p style="margin:0">Appuie-toi sur tes <strong>compétences</strong> (Life Skills), présente ton projet et **ose poser des questions**.</p>
-        </div>
+      <div class="id-row">
+        <input id="firstName" placeholder="Prénom" autocomplete="given-name" />
+        <input id="lastName" placeholder="Nom" autocomplete="family-name" />
+        <button class="btn" id="btnIdentify" type="button">Je démarre la mission</button>
       </div>
-    </section>
+    </div>
 
-    <!-- PAGE 2 — SECTEURS -->
-    <section class="page" id="page2" aria-labelledby="t2">
-      <div class="card">
-        <h2 id="t2" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
-          🗺️ Parcours des secteurs
-        </h2>
-        <p class="page-subtitle" style="margin:0 0 10px; color:var(--muted)">
-          Clique sur les entreprises pour **enregistrer un contact** et gagner des progressions.
-        </p>
-        <div id="sectors" class="sectors"></div>
+    <!-- Besoin d'aide / Questions types -->
+    <div class="card" style="margin-top:14px">
+      <h3 style="margin:0 0 8px;font:700 20px/1 'Politica','Muli',sans-serif">❓ Besoin d’aide pour démarrer ? — Questions types pour briser la glace</h3>
+      <div class="sectors" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+        <div class="company"><div>🎯 Quelles sont les qualités que vous recherchez le plus ?</div></div>
+        <div class="company"><div>💼 Quels métiers recrutent le plus dans votre entreprise ?</div></div>
+        <div class="company"><div>🎓 Proposez-vous des stages ou des immersions ?</div></div>
+        <div class="company"><div>📚 Faut-il un diplôme ou une expérience ?</div></div>
+        <div class="company"><div>🌟 Peut-on postuler même si on n'a jamais travaillé ?</div></div>
+        <div class="company"><div>⏰ Comment se déroule une journée type ?</div></div>
+        <div class="company"><div>🚀 Quelles sont les perspectives d'évolution ?</div></div>
+        <div class="company"><div>🤝 Comment fonctionne l'équipe de travail ?</div></div>
+        <div class="company"><div>💰 Quels sont les horaires et la rémunération ?</div></div>
+        <div class="company"><div>📞 Comment puis-je vous recontacter ?</div></div>
       </div>
-    </section>
+      <div class="id-row" style="margin-top:10px">
+        <textarea id="myQuestions" placeholder="✏️ Mes questions personnelles"></textarea>
+      </div>
+    </div>
+  </section>
 
-    <!-- PAGE 3 — BADGES -->
-    <section class="page" id="page3" aria-labelledby="t3">
+  <!-- PAGE 2 — PLAN SECTEURS (ajout/suppression + apprentissage/intérim) -->
+  <section class="page" id="page2" aria-labelledby="t2">
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <h2 id="t2" style="font:700 26px/1.2 'Politica','Muli',sans-serif;margin:0 8px 6px 0">🗺️ Plan du forum</h2>
+        <button class="btn small icon" id="btnAddSector">➕ Secteur</button>
+        <button class="btn small icon" id="btnAddCompany">🏢 + Entreprise</button>
+        <button class="btn small icon secondary" id="btnApprenticeship">🎓 Offres apprentissage</button>
+        <button class="btn small icon secondary" id="btnInterim">🧩 Offres intérim</button>
+        <button class="btn small ghost" id="btnEditMode">✏️ Mode édition : OFF</button>
+      </div>
+      <p style="margin:6px 0 10px;color:var(--muted)">Clique sur les entreprises pour <strong>enregistrer un contact</strong>. En mode édition, tu peux <strong>supprimer</strong> des secteurs/entreprises.</p>
+      <div id="sectors" class="sectors"></div>
+    </div>
+  </section>
+
+  <!-- PAGE 3 — GAMIFICATION (badges + niveaux + éco-challenge) -->
+  <section class="page" id="page3" aria-labelledby="t3">
+    <div class="gamif-grid">
       <div class="card">
-        <h2 id="t3" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
-          🏅 Mes badges
-        </h2>
-        <p class="page-subtitle" style="margin:0 0 10px; color:var(--muted)">
-          Collectionne tes badges en visitant et en contactant des entreprises.
-        </p>
+        <h2 id="t3" style="font:700 26px/1.2 'Politica','Muli',sans-serif;margin:0 0 6px">🎯 Gamification — Comment réussir ta mission ?</h2>
+        <p style="margin:0 0 10px;color:var(--muted)">5 niveaux de défis pour devenir un pro !</p>
+
+        <div class="levels">
+          <div class="level"><strong>1 — Premier Contact</strong> : Dire bonjour et se présenter (prénom, âge, ce que tu recherches). <em>Badge Premier Contact +100 pts</em></div>
+          <div class="level"><strong>2 — Communicateur</strong> : Poser une question sur le métier ou les qualités recherchées. <em>Badge Communicateur +150 pts</em></div>
+          <div class="level"><strong>3 — Candidat Pro</strong> : Déposer ton CV / laisser tes coordonnées. <em>Badge Candidat Pro +200 pts</em></div>
+          <div class="level"><strong>4 — Networker</strong> : Obtenir une promesse de stage/immersion ou contact privilégié. <em>Badge Networker +300 pts</em></div>
+          <div class="level"><strong>5 — Job Hunter</strong> : Être rappelé pour un entretien / proposition concrète. <em>Badge Job Hunter +500 pts</em></div>
+          <div class="level" style="border-left-color:var(--green)"><strong>🌱 Éco-Warrior</strong> : Venir en mode éco (vélo, marche, transport public, covoiturage). <em>+250 pts</em></div>
+        </div>
+
+        <h3 style="margin:10px 0 6px;font:700 20px/1 'Politica','Muli',sans-serif">🏅 Mes badges</h3>
         <div id="badges" class="badges"></div>
       </div>
-    </section>
 
-    <!-- PAGE 4 — BILAN (écran) -->
-    <section class="page" id="page4" aria-labelledby="t4">
       <div class="card">
-        <h2 id="t4" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
-          📊 Bilan de mission (écran)
-        </h2>
-        <div id="stats" class="stats" style="margin-top:8px"></div>
-        <div class="id-row" style="margin-top:16px">
-          <button class="btn" id="btnCopy">📋 Copier le bilan</button>
-          <button class="btn secondary" id="btnLinkedin">💼 Partager LinkedIn</button>
-          <button class="btn dark" data-goto="5">🖨️ Créer mon PDF</button>
+        <h3 style="margin:0 0 8px;font:700 20px/1 'Politica','Muli',sans-serif">🏆 SCORE TOTAL</h3>
+        <div class="scorebox">
+          <div class="big" id="totalScore">0 POINTS</div>
+          <div class="rank" id="rank">🌟 Débutant Motivé</div>
+          <div style="margin:10px 0">
+            <div class="progress"><span id="rankProgress" style="width:0%"></span></div>
+            <div style="font-size:12px;margin-top:4px;color:var(--muted)">Prochain rang : <span id="nextRank">🌟 Débutant Motivé (500 pts)</span></div>
+          </div>
+          <div class="id-row" style="margin-top:10px">
+            <button class="btn small icon" id="btnQr">📱 Générer QR Code</button>
+            <button class="btn small icon" data-goto="5">📄 Télécharger Bilan</button>
+            <button class="btn small icon secondary" id="btnShare">📤 Partager Résultats</button>
+          </div>
+          <div id="qrWrap" style="margin-top:10px;text-align:center"></div>
         </div>
-      </div>
-    </section>
 
-    <!-- PAGE 5 — BILAN VISUEL (PDF) -->
-    <section class="page" id="page5" aria-labelledby="t5">
-      <div class="card" id="reportVisual" style="padding:24px">
-        <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px">
-          <div style="width:14px; height:54px; background:linear-gradient(180deg,var(--orange),var(--blue)); border-radius:8px"></div>
-          <div>
-            <h2 id="t5" class="page-title" style="margin:0; font:700 28px/1.1 'Politica','Muli',sans-serif">Bilan Serious Game – Forum Mission Locale</h2>
-            <p id="reportUser" style="margin:4px 0 0; font-weight:700">Participant : —</p>
+        <h3 style="margin:12px 0 6px;font:700 20px/1 'Politica','Muli',sans-serif">🌱 Challenge Mobilité Bien-être</h3>
+        <div class="eco">
+          <div class="tile">
+            <div>🚶‍♂️ km à pied</div>
+            <div class="id-row" style="margin-top:6px"><input id="kmWalk" type="number" min="0" step="0.1" placeholder="0" /></div>
+          </div>
+          <div class="tile">
+            <div>🚴‍♂️ km vélo</div>
+            <div class="id-row" style="margin-top:6px"><input id="kmBike" type="number" min="0" step="0.1" placeholder="0" /></div>
+          </div>
+          <div class="tile">
+            <div>🚌 Transport public</div>
+            <div class="id-row" style="margin-top:6px">
+              <select id="usedTransit">
+                <option value="no">Non</option><option value="yes">Oui</option>
+              </select>
+            </div>
+          </div>
+          <div class="tile">
+            <div>🚗 Covoiturage</div>
+            <div class="id-row" style="margin-top:6px">
+              <select id="usedCarpool">
+                <option value="no">Non</option><option value="yes">Oui</option>
+              </select>
+            </div>
           </div>
         </div>
-
-        <!-- Frise “mission accomplie” -->
-        <div class="timeline" style="margin:16px 0 8px">
-          <div class="step" data-status="done"><span class="k">1</span>Identification</div>
-          <div class="step" data-status="done"><span class="k">2</span>Explorer</div>
-          <div class="step" data-status="done"><span class="k">3</span>Valider</div>
-          <div class="step" data-status="done"><span class="k">4</span>Bilan</div>
-        </div>
-
-        <!-- Stats visuelles -->
-        <div class="stats" id="statsPdf" style="margin:8px 0 12px"></div>
-
-        <!-- Badges visuels -->
-        <div>
-          <h3 style="margin:10px 0 6px; font:700 20px/1 'Politica','Muli',sans-serif">Badges obtenus</h3>
-          <div class="badges" id="badgesPdf"></div>
-        </div>
-
-        <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center">
-          <div style="font-size:12px; color:var(--muted)">Généré le <span id="reportDate"></span> — Mission Locale de France</div>
-          <button class="btn" id="btnPrint" type="button">📥 Télécharger en PDF</button>
+        <div class="scorebox" style="margin-top:10px">
+          <div>Score Éco : <span id="ecoScore" class="big">0</span> pts</div>
+          <button class="btn small" id="btnEcoValidate">Valider Éco-Warrior</button>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-  </main>
+  <!-- PAGE 4 — BILAN (écran) -->
+  <section class="page" id="page4" aria-labelledby="t4">
+    <div class="card">
+      <h2 id="t4" style="font:700 26px/1.2 'Politica','Muli',sans-serif;margin:0 0 6px">📊 Bilan de mission (écran)</h2>
+      <div id="stats" class="stats" style="margin-top:8px"></div>
+      <div class="id-row" style="margin-top:16px">
+        <button class="btn" id="btnCopy">📋 Copier le bilan</button>
+        <button class="btn secondary" id="btnLinkedin">💼 Partager LinkedIn</button>
+        <button class="btn dark" data-goto="5">🖨️ Créer mon PDF</button>
+      </div>
+    </div>
+  </section>
 
-  <!-- NAV -->
-  <nav class="nav" aria-label="Navigation pages">
-    <button type="button" data-goto="1" aria-current="page" title="Page 1">1</button>
-    <button type="button" data-goto="2" title="Page 2">2</button>
-    <button type="button" data-goto="3" title="Page 3">3</button>
-    <button type="button" data-goto="4" title="Page 4">4</button>
-    <button type="button" data-goto="5" title="Page 5">5</button>
-  </nav>
+  <!-- PAGE 5 — BILAN VISUEL (PDF) -->
+  <section class="page" id="page5" aria-labelledby="t5">
+    <div class="card" id="reportVisual" style="padding:24px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+        <div style="width:14px;height:54px;background:linear-gradient(180deg,var(--orange),var(--blue));border-radius:8px"></div>
+        <div>
+          <h2 id="t5" style="margin:0;font:700 28px/1.1 'Politica','Muli',sans-serif">Mission accomplie !</h2>
+          <p id="reportUser" style="margin:4px 0 0;font-weight:700">Collecte tes badges et retrouve ton conseiller — Participant : —</p>
+        </div>
+      </div>
 
-  <!-- TOAST -->
-  <div id="toast" class="notice" role="status" aria-live="polite"></div>
+      <div class="scorebox" style="margin-bottom:12px">
+        <div>🏆 SCORE TOTAL 🏆</div>
+        <div class="big" id="totalScorePdf">0 POINTS</div>
+        <div class="rank" id="rankPdf">🌟 Débutant Motivé</div>
+      </div>
 
-  <script>
-    // ====== STATE ======
-    const visitedSectors = new Set();
-    const contactedCompanies = new Set();
-    const badgesData = [
-      {id:'explorer',  title:'Explorateur', target:3, progress:0, icon:'🧭', description:'Visiter 3 secteurs'},
-      {id:'networker', title:'Networker',  target:5, progress:0, icon:'🤝', description:'Contacter 5 entreprises'},
-      {id:'complete',  title:'Identifié',  target:1, progress:0, icon:'✅', description:'Renseigner son identité'},
-      {id:'social',    title:'Ambassadeur',target:1, progress:0, icon:'📣', description:'Partager ses résultats'}
-    ];
+      <div class="timeline" style="margin:16px 0 8px">
+        <div class="step" data-status="done"><span class="k">1</span>Premier Contact</div>
+        <div class="step" data-status="done"><span class="k">2</span>Communicateur</div>
+        <div class="step" data-status="done"><span class="k">3</span>Candidat Pro</div>
+        <div class="step" data-status="done"><span class="k">4</span>Networker</div>
+      </div>
 
-    const sectorsData = {
-      tech:{name:'Tech & Digital', icon:'💻', companies:[
-        {name:'WebDev Bayonne', desc:'Développement web', jobs:['Développeur','Designer','Chef de projet']},
-        {name:'DataSoft Biarritz', desc:'Data & IA', jobs:['Data Analyst','Dev Python','Consultant IA']}
-      ]},
-      resto:{name:'Restauration', icon:'🍽️', companies:[
-        {name:'Le Bistrot Basque', desc:'Cuisine traditionnelle', jobs:['Cuisinier','Serveur','Commis']},
-        {name:'Café des Halles', desc:'Café-brasserie', jobs:['Serveur','Barista','Plongeur']}
-      ]},
-      sante:{name:'Santé & Social', icon:'🏥', companies:[
-        {name:'EHPAD Ustaritz', desc:'Accompagnement des aînés', jobs:['Aide-soignant','AS','IDE']},
-        {name:'Centre Social BAB', desc:'Animation & lien social', jobs:['Animateur','Médiateur']}
-      ]},
-      transport:{name:'Transport & Logistique', icon:'🚛', companies:[
-        {name:'Logi64', desc:'Plateforme logistique', jobs:['Préparateur','Cariste']},
-        {name:'AdourTrans', desc:'Transport régional', jobs:['Conducteur','Livreur']}
-      ]}
-    };
+      <div class="stats" id="statsPdf" style="margin:8px 0 12px"></div>
 
-    // ====== HELPERS ======
-    const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
+      <h3 style="margin:10px 0 6px;font:700 20px/1 'Politica','Muli',sans-serif">Badges obtenus</h3>
+      <div class="badges" id="badgesPdf"></div>
 
-    function toast(msg, type='info'){
-      const t = $('#toast');
-      t.className = 'notice ' + (type==='ok'?'ok':type==='warn'?'warn':type==='err'?'err':'');
-      t.textContent = msg; t.style.display='block';
-      clearTimeout(t._h); t._h = setTimeout(()=>{t.style.display='none'}, 2600);
-    }
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+        <button class="btn small" id="btnPrint" type="button">📥 Télécharger en PDF</button>
+        <button class="btn small secondary" id="btnPdfShare" type="button">📤 Partager</button>
+        <div style="font-size:12px;color:var(--muted);margin-left:auto">Généré le <span id="reportDate"></span> — Mission Locale de France</div>
+      </div>
+    </div>
+  </section>
+</main>
 
-    function setProgress(stepIndex){ // 1..4
-      const nodes = $$('.timeline .step');
-      nodes.forEach((el,i)=>{
-        const idx = i+1;
-        el.setAttribute('data-status', idx < stepIndex ? 'done' : idx === stepIndex ? 'curr' : '');
-      });
-    }
+<!-- NAV -->
+<nav class="nav" aria-label="Navigation pages">
+  <button type="button" data-goto="1" aria-current="page">1</button>
+  <button type="button" data-goto="2">2</button>
+  <button type="button" data-goto="3">3</button>
+  <button type="button" data-goto="4">4</button>
+  <button type="button" data-goto="5">5</button>
+</nav>
 
-    function showPage(n){
-      $$('.page').forEach(p=>p.classList.toggle('active', p.id === 'page'+n));
-      $$('.nav button').forEach(b=>{
-        const on = b.dataset.goto === String(n);
-        b.setAttribute('aria-current', on ? 'page' : 'false');
-      });
-      if(n===2) { renderSectors(); setProgress(2); }
-      if(n===3) { renderBadges(); setProgress(3); }
-      if(n===4) { renderReport(); setProgress(4); }
-      if(n===5) { prepareReportVisual(); setProgress(4); }
-      window.scrollTo({top:0, behavior:'smooth'});
-    }
+<!-- TOAST -->
+<div id="toast" class="notice" role="status" aria-live="polite"></div>
 
-    // ====== IDENTITÉ ======
-    function updateIdentity(){
-      const fn = $('#firstName').value.trim();
-      const ln = $('#lastName').value.trim();
-      if(fn && ln){ $('.subtitle').textContent = `Bienvenue ${fn} — c’est parti !`; }
-    }
-    function registerIdentity(){
-      const fn = $('#firstName').value.trim();
-      const ln = $('#lastName').value.trim();
-      if(!fn || !ln){ toast('Remplis d’abord ton prénom et ton nom.', 'warn'); return; }
-      updateBadge('complete', 1);
-      toast(`Bienvenue ${fn} ${ln} ! 🚀`, 'ok');
-      showPage(2);
-    }
+<script>
+  // ====== STATE ======
+  const visitedSectors = new Set();
+  const contactedCompanies = new Set();
+  let editMode = false;
 
-    // ====== SECTEURS ======
-    function renderSectors(){
-      const wrap = $('#sectors'); wrap.innerHTML='';
-      Object.entries(sectorsData).forEach(([key, sec])=>{
-        const card = document.createElement('article');
-        card.className='sector';
-        card.innerHTML = `<h3>${sec.icon} ${sec.name}</h3>`;
-        sec.companies.forEach(c=>{
-          const box = document.createElement('div');
-          box.className='company';
-          box.innerHTML = `
-            <div class="name">${c.name}</div>
-            <div>${c.desc}</div>
-            <div class="jobs">
-              ${c.jobs.map(j=>`<button class="job" type="button" data-company="${c.name}" data-sector="${key}" data-job="${j}">${j}</button>`).join('')}
-            </div>`;
-          // un click sur la carte = contact
-          box.addEventListener('click', ()=>{
-            contactedCompanies.add(c.name);
-            updateBadge('networker', contactedCompanies.size);
-            visitedSectors.add(sec.name);
-            updateBadge('explorer', visitedSectors.size);
-            toast(`✅ Contact avec ${c.name}`, 'ok');
-          });
-          card.appendChild(box);
+  // Badge config (+ points)
+  const badgePoints = {
+    premier:100, communicateur:150, candidat:200, networker:300, jobhunter:500, eco:250
+  };
+  const rankTiers = [
+    {name:'🌟 Débutant Motivé', min:0, next:500},
+    {name:'🚀 Explorateur Pro', min:500, next:1200},
+    {name:'💼 Candidat Confirmé', min:1200, next:2200},
+    {name:'🏆 Job Hunter', min:2200, next:Infinity}
+  ];
+  let totalScore = 0;
+
+  const badgesData = [
+    {id:'premier',      title:'Premier Contact',   target:1, progress:0, icon:'🎯', description:'+100 pts'},
+    {id:'communicateur',title:'Communicateur',     target:1, progress:0, icon:'🗣️', description:'+150 pts'},
+    {id:'candidat',     title:'Candidat Pro',      target:1, progress:0, icon:'📋', description:'+200 pts'},
+    {id:'networker',    title:'Networker',         target:1, progress:0, icon:'🤝', description:'+300 pts'},
+    {id:'jobhunter',    title:'Job Hunter',        target:1, progress:0, icon:'🏆', description:'+500 pts'},
+    {id:'eco',          title:'Éco-Warrior',       target:1, progress:0, icon:'🌱', description:'+250 pts'}
+  ];
+
+  const sectorsData = {
+    tech:{name:'Tech & Digital', icon:'💻', companies:[
+      {name:'WebDev Bayonne', desc:'Développement web', jobs:['Développeur','Designer','Chef de projet']},
+      {name:'DataSoft Biarritz', desc:'Data & IA', jobs:['Data Analyst','Dev Python','Consultant IA']}
+    ]},
+    resto:{name:'Restauration', icon:'🍽️', companies:[
+      {name:'Le Bistrot Basque', desc:'Cuisine traditionnelle', jobs:['Cuisinier','Serveur','Commis']},
+      {name:'Café des Halles', desc:'Café-brasserie', jobs:['Serveur','Barista','Plongeur']}
+    ]},
+    sante:{name:'Santé & Social', icon:'🏥', companies:[
+      {name:'EHPAD Ustaritz', desc:'Accompagnement des aînés', jobs:['Aide-soignant','AS','IDE']},
+      {name:'Centre Social BAB', desc:'Animation & lien social', jobs:['Animateur','Médiateur']}
+    ]},
+    transport:{name:'Transport & Logistique', icon:'🚛', companies:[
+      {name:'Logi64', desc:'Plateforme logistique', jobs:['Préparateur','Cariste']},
+      {name:'AdourTrans', desc:'Transport régional', jobs:['Conducteur','Livreur']}
+    ]}
+  };
+
+  // ====== HELPERS ======
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  function toast(msg, type='info'){
+    const t = $('#toast');
+    t.className = 'notice ' + (type==='ok'?'ok':type==='warn'?'warn':type==='err'?'err':'');
+    t.textContent = msg; t.style.display='block';
+    clearTimeout(t._h); t._h = setTimeout(()=>{t.style.display='none'}, 2600);
+  }
+  function setProgress(stepIndex){
+    $$('.timeline .step').forEach((el,i)=>{
+      const idx = i+1;
+      el.setAttribute('data-status', idx < stepIndex ? 'done' : idx === stepIndex ? 'curr' : '');
+    });
+  }
+  function showPage(n){
+    $$('.page').forEach(p=>p.classList.toggle('active', p.id === 'page'+n));
+    $$('.nav button').forEach(b=>{
+      const on = b.dataset.goto === String(n);
+      b.setAttribute('aria-current', on ? 'page' : 'false');
+    });
+    if(n===2){ renderSectors(); setProgress(2); }
+    if(n===3){ renderBadges(); updateScoreUI(); setProgress(3); }
+    if(n===4){ renderReport(); setProgress(4); }
+    if(n===5){ prepareReportVisual(); setProgress(4); }
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function computeStats(){
+    const totalSectors = visitedSectors.size;
+    const totalContacts = contactedCompanies.size;
+    const totalBadges = badgesData.filter(b=>b.progress>=b.target).length;
+    const completionRate = Math.round((totalBadges / badgesData.length) * 100);
+    return {totalSectors,totalContacts,totalBadges,completionRate};
+  }
+  function rankFor(score){
+    for(let i=rankTiers.length-1;i>=0;i--) if(score>=rankTiers[i].min) return rankTiers[i];
+    return rankTiers[0];
+  }
+  function updateScore(points){
+    totalScore = Math.max(0, totalScore + (points||0));
+    updateScoreUI();
+  }
+  function updateScoreUI(){
+    const r = rankFor(totalScore);
+    const next = rankTiers.find(t=>t.min>r.min) || {name:r.name,next:Infinity};
+    const need = (next.next===Infinity)?0:Math.max(0,next.next-totalScore);
+    const pct = (next.next===Infinity)?100:Math.min(100, Math.round(((totalScore-r.min)/(next.next-r.min))*100));
+
+    $('#totalScore') && ($('#totalScore').textContent = `${totalScore} POINTS`);
+    $('#rank') && ($('#rank').textContent = r.name);
+    $('#nextRank') && ($('#nextRank').textContent = `${next.name} (${next.next===Infinity?'max':next.next} pts${need?` — +${need} pts`:''})`);
+    $('#rankProgress') && ($('#rankProgress').style.width = pct+'%');
+
+    $('#totalScorePdf') && ($('#totalScorePdf').textContent = `${totalScore} POINTS`);
+    $('#rankPdf') && ($('#rankPdf').textContent = r.name);
+  }
+
+  // ====== IDENTITÉ ======
+  function registerIdentity(){
+    const fn = $('#firstName').value.trim(), ln = $('#lastName').value.trim();
+    if(!fn || !ln){ toast('Remplis d’abord ton prénom et ton nom.','warn'); return; }
+    showPage(2);
+    toast(`Bienvenue ${fn} ${ln} ! 🚀`,'ok');
+  }
+
+  // ====== SECTEURS ======
+  function renderSectors(){
+    const wrap = $('#sectors'); wrap.innerHTML='';
+    Object.entries(sectorsData).forEach(([key, sec])=>{
+      const card = document.createElement('article');
+      card.className='sector'; card.dataset.key = key;
+      card.innerHTML = `<h3>${sec.icon} ${sec.name}</h3>
+        <div class="actions">
+          ${editMode ? '<button class="btn small del">🗑 Supprimer secteur</button>' : ''}
+        </div>`;
+
+      sec.companies.forEach((c,idx)=>{
+        const box = document.createElement('div');
+        box.className='company'; box.dataset.index = idx;
+        box.innerHTML = `
+          <div class="name">${c.name}</div>
+          <div>${c.desc}</div>
+          ${editMode ? '<button class="btn small del">🗑</button>' : ''}
+          <div class="jobs">${c.jobs.map(j=>`<button class="job" type="button" data-company="${c.name}" data-sector="${key}" data-job="${j}">${j}</button>`).join('')}</div>`;
+        // click = contact (hors suppression)
+        box.addEventListener('click', (e)=>{
+          if(e.target.closest('.del')) return; // en mode édition, on ne compte pas
+          contactedCompanies.add(c.name);
+          visitedSectors.add(sec.name);
+          toast(`✅ Contact avec ${c.name}`,'ok');
+          // progression gamifiée basique : premier contact -> badge premier
+          awardBadgeOnce('premier');
+          updateReportAndGamif();
         });
-        wrap.appendChild(card);
+        // suppression entreprise
+        if(editMode){
+          box.querySelector('.del').addEventListener('click', (e)=>{
+            e.stopPropagation();
+            if(confirm(`Supprimer l’entreprise « ${c.name} » ?`)){
+              sectorsData[key].companies.splice(idx,1);
+              renderSectors();
+            }
+          });
+        }
+        card.appendChild(box);
       });
 
-      // Click précis sur une "job pill"
-      wrap.addEventListener('click', (e)=>{
-        const btn = e.target.closest('.job');
-        if(!btn) return;
-        e.stopPropagation();
-        toast(`ℹ️ ${btn.dataset.job} @ ${btn.dataset.company}`);
-      });
-    }
-
-    // ====== BADGES ======
-    function updateBadge(id, progress){
-      const b = badgesData.find(x=>x.id===id);
-      if(!b) return;
-      const before = b.progress;
-      b.progress = Math.max(b.progress, progress);
-      if(before < b.target && b.progress >= b.target){
-        toast(`🏆 Badge obtenu : ${b.title}`, 'ok');
+      // suppression secteur
+      if(editMode){
+        card.querySelector('.actions .del').addEventListener('click', ()=>{
+          if(confirm(`Supprimer le secteur « ${sec.name} » ?`)){
+            delete sectorsData[key];
+            renderSectors();
+          }
+        });
       }
-      renderBadges();
-    }
-    function renderBadges(){
-      const wrap = $('#badges'); if(!wrap) return; wrap.innerHTML='';
-      badgesData.forEach(b=>{
-        const ok = b.progress >= b.target;
-        const el = document.createElement('div');
-        el.className = 'badge' + (ok ? ' earned' : '');
-        el.innerHTML = `
-          <div class="em">${b.icon}</div>
-          <div class="title">${b.title}</div>
-          <div class="desc">${b.description}</div>
-          <div class="count">${Math.min(b.progress,b.target)} / ${b.target}</div>`;
-        wrap.appendChild(el);
-      });
-    }
 
-    // ====== BILAN (écran) ======
-    function computeStats(){
-      const totalSectors = visitedSectors.size;
-      const totalContacts = contactedCompanies.size;
-      const totalBadges = badgesData.filter(b=>b.progress>=b.target).length;
-      const completionRate = Math.round((totalBadges / badgesData.length) * 100);
-      return {totalSectors,totalContacts,totalBadges,completionRate};
-    }
-    function renderReport(){
-      const s = computeStats();
-      const wrap = $('#stats'); wrap.innerHTML='';
-      const items = [
-        ['Secteurs visités', s.totalSectors],
-        ['Entreprises contactées', s.totalContacts],
-        ['Badges obtenus', s.totalBadges],
-        ['Taux de réussite', s.completionRate+'%']
-      ];
-      items.forEach(([label,val])=>{
-        const d = document.createElement('div'); d.className='stat';
-        d.innerHTML = `<div class="num">${val}</div><div>${label}</div>`;
+      wrap.appendChild(card);
+    });
+
+    // clic sur job pill (info)
+    wrap.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.job'); if(!btn) return;
+      e.stopPropagation();
+      toast(`ℹ️ ${btn.dataset.job} @ ${btn.dataset.company}`);
+      awardBadgeOnce('communicateur'); // poser une question ~ interaction
+      updateReportAndGamif();
+    }, {once:true});
+  }
+
+  // ajout secteur / entreprise / offres
+  function addSector(){
+    const name = prompt('Nom du secteur ?'); if(!name) return;
+    const key = name.toLowerCase().replace(/\s+/g,'');
+    sectorsData[key] = {name, icon:'🧭', companies:[]};
+    renderSectors();
+  }
+  function addCompany(){
+    const keys = Object.keys(sectorsData); if(!keys.length){toast('Ajoute d’abord un secteur.','warn');return;}
+    const sectorKey = prompt(`Dans quel secteur ?\n${keys.join(', ')}`, keys[0]); if(!sectorKey || !sectorsData[sectorKey]) return;
+    const name = prompt('Nom de l’entreprise ?'); if(!name) return;
+    const desc = prompt('Description ?') || 'Entreprise partenaire';
+    const jobs = (prompt('Métiers (séparés par des virgules) ?')||'Candidature').split(',').map(s=>s.trim()).filter(Boolean);
+    sectorsData[sectorKey].companies.push({name,desc,jobs});
+    renderSectors();
+  }
+  function showApprenticeship(){
+    alert('Affichage des offres en apprentissage (déclinables par centre de formation). Intègre ici ta source (API/CSV) et la liste filtrable.');
+  }
+  function showInterim(){
+    alert('Affichage des offres en intérim (déclinables par agences partenaires). Intègre ici ta source (API/CSV) et la liste filtrable.');
+  }
+
+  // ====== BADGES & SCORE ======
+  function awardBadgeOnce(id){
+    const b = badgesData.find(x=>x.id===id); if(!b) return;
+    if(b.progress>=b.target) return;
+    b.progress = b.target;
+    updateScore(badgePoints[id]||0);
+    toast(`🏆 Badge obtenu : ${b.title} (+${badgePoints[id]||0} pts)`,'ok');
+    renderBadges();
+  }
+  function renderBadges(){
+    const wrap = $('#badges'); if(!wrap) return;
+    wrap.innerHTML='';
+    badgesData.forEach(b=>{
+      const ok = b.progress>=b.target;
+      const el = document.createElement('div');
+      el.className='badge' + (ok?' earned':'');
+      el.innerHTML = `<div class="em">${b.icon}</div>
+        <div class="title">${b.title}</div>
+        <div class="desc">${b.description}</div>
+        <div class="count">${Math.min(b.progress,b.target)} / ${b.target}</div>`;
+      wrap.appendChild(el);
+    });
+  }
+
+  // ====== ECO CHALLENGE ======
+  function ecoPoints(){
+    const kmW = parseFloat($('#kmWalk').value||0);
+    const kmB = parseFloat($('#kmBike').value||0);
+    const t = $('#usedTransit').value==='yes' ? 50 : 0;
+    const c = $('#usedCarpool').value==='yes' ? 50 : 0;
+    // barème simple : 10 pts / km à pied, 8 pts / km vélo
+    return Math.max(0, Math.round(kmW*10 + kmB*8 + t + c));
+  }
+  function updateEcoScore(){
+    const pts = ecoPoints();
+    $('#ecoScore').textContent = pts;
+  }
+
+  // ====== REPORTS ======
+  function renderReport(){
+    const s = computeStats();
+    const wrap = $('#stats'); wrap.innerHTML='';
+    [['Secteurs visités', s.totalSectors],['Entreprises contactées', s.totalContacts],['Badges obtenus', s.totalBadges],['Taux de réussite', s.completionRate+'%']]
+      .forEach(([label,val])=>{
+        const d=document.createElement('div'); d.className='stat';
+        d.innerHTML=`<div class="num">${val}</div><div>${label}</div>`;
         wrap.appendChild(d);
       });
-    }
-    function buildReportText(){
-      const fn = $('#firstName').value.trim(), ln = $('#lastName').value.trim();
-      const who = (fn && ln) ? `${fn} ${ln}` : 'Participant';
-      const s = computeStats();
-      return `BILAN FORUM
+  }
+  function prepareReportVisual(){
+    const fn = $('#firstName').value.trim(), ln = $('#lastName').value.trim();
+    $('#reportUser').textContent = `Collecte tes badges et retrouve ton conseiller — Participant : ${(fn||'—')+' '+(ln||'')}`.trim();
+    $('#reportDate').textContent = new Date().toLocaleString('fr-FR');
+    // stats
+    const s = computeStats();
+    const statsPdf = $('#statsPdf'); statsPdf.innerHTML='';
+    [['Secteurs visités', s.totalSectors],['Entreprises contactées', s.totalContacts],['Badges obtenus', s.totalBadges],['Taux de réussite', s.completionRate+'%']]
+      .forEach(([label,val])=>{
+        const d=document.createElement('div'); d.className='stat';
+        d.innerHTML=`<div class="num">${val}</div><div>${label}</div>`;
+        statsPdf.appendChild(d);
+      });
+    // badges
+    const bpdf = $('#badgesPdf'); bpdf.innerHTML='';
+    badgesData.forEach(b=>{
+      const ok = b.progress>=b.target;
+      const el = document.createElement('div');
+      el.className='badge' + (ok?' earned':'');
+      el.innerHTML = `<div class="em">${b.icon}</div><div class="title">${b.title}</div><div class="desc">${b.description}</div>`;
+      bpdf.appendChild(el);
+    });
+    updateScoreUI(); // met à jour score/rang PDF
+  }
+  function buildReportText(){
+    const fn=$('#firstName').value.trim(), ln=$('#lastName').value.trim();
+    const who=(fn&&ln)?`${fn} ${ln}`:'Participant';
+    const s=computeStats();
+    return `BILAN FORUM
 Participant : ${who}
 Date : ${new Date().toLocaleDateString('fr-FR')}
 Heure : ${new Date().toLocaleTimeString('fr-FR')}
@@ -484,82 +599,77 @@ STATISTIQUES
 • Secteurs visités : ${s.totalSectors}
 • Entreprises contactées : ${s.totalContacts}
 • Badges obtenus : ${s.totalBadges}/${badgesData.length}
-• Taux de réussite : ${s.completionRate}%
+• Score total : ${totalScore} pts
 
 — Mission Locale`;
-    }
-    async function copyReport(){
-      const text = buildReportText();
-      try{ await navigator.clipboard.writeText(text); updateBadge('social',1); toast('📋 Bilan copié !','ok'); }
-      catch{ toast('Impossible de copier automatiquement.','err'); }
-    }
-    function shareLinkedIn(){
-      const s = computeStats();
-      const text = `Je viens de participer au Forum Mission Locale ! ${s.totalSectors} secteurs, ${s.totalContacts} contacts, ${s.totalBadges} badges.`;
-      const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(text)}`;
-      window.open(url, '_blank','width=720,height=600,noopener');
-      updateBadge('social',1);
-    }
+  }
 
-    // ====== BILAN VISUEL (PDF – Page 5) ======
-    function prepareReportVisual(){
-      const fn = $('#firstName').value.trim(), ln = $('#lastName').value.trim();
-      $('#reportUser').textContent = `Participant : ${fn || '—'} ${ln || ''}`.trim();
-      $('#reportDate').textContent = new Date().toLocaleString('fr-FR');
+  // ====== SHARE / QR / PRINT ======
+  function copyReport(){
+    const text=buildReportText();
+    navigator.clipboard.writeText(text).then(()=>toast('📋 Bilan copié !','ok')).catch(()=>toast('Impossible de copier automatiquement.','err'));
+  }
+  function shareLinkedIn(){
+    const s=computeStats();
+    const text=`Je viens de participer au Forum Mission Locale ! ${s.totalSectors} secteurs, ${s.totalContacts} contacts, ${s.totalBadges} badges, ${totalScore} pts.`;
+    const url=`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(text)}`;
+    window.open(url,'_blank','width=720,height=600,noopener');
+  }
+  function shareGeneric(){
+    const text=buildReportText();
+    if(navigator.share){navigator.share({title:'Bilan Serious Game',text});}
+    else{copyReport();}
+  }
+  function makeQR(){
+    const data=encodeURIComponent(buildReportText());
+    const img=`<img alt="QR Code" width="220" height="220" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${data}" />`;
+    $('#qrWrap').innerHTML = img;
+  }
+  function printToPdf(){ window.print(); }
 
-      // stats pdf
-      const s = computeStats();
-      const statsPdf = $('#statsPdf'); statsPdf.innerHTML='';
-      [
-        ['Secteurs visités', s.totalSectors],
-        ['Entreprises contactées', s.totalContacts],
-        ['Badges obtenus', s.totalBadges],
-        ['Taux de réussite', s.completionRate+'%']
-      ].forEach(([label,val])=>{
-        const d = document.createElement('div'); d.className='stat';
-        d.innerHTML = `<div class="num">${val}</div><div>${label}</div>`;
-        statsPdf.appendChild(d);
-      });
-
-      // badges pdf
-      const bpdf = $('#badgesPdf'); bpdf.innerHTML='';
-      badgesData.forEach(b=>{
-        const ok = b.progress >= b.target;
-        const el = document.createElement('div');
-        el.className = 'badge' + (ok ? ' earned' : '');
-        el.innerHTML = `
-          <div class="em">${b.icon}</div>
-          <div class="title">${b.title}</div>
-          <div class="desc">${b.description}</div>
-          <div class="count">${Math.min(b.progress,b.target)} / ${b.target}</div>`;
-        bpdf.appendChild(el);
-      });
-    }
-
-    function printToPdf(){ window.print(); }
-
-    // ====== WIRING ======
-    // nav
-    document.querySelector('.nav').addEventListener('click', (e)=>{
-      const btn = e.target.closest('button[data-goto]');
-      if(!btn) return;
-      showPage(Number(btn.dataset.goto));
-    });
-
-    // identité
-    $('#firstName').addEventListener('input', updateIdentity);
-    $('#lastName').addEventListener('input', updateIdentity);
-    $('#btnIdentify').addEventListener('click', registerIdentity);
-
-    // actions
-    $('#btnCopy')?.addEventListener('click', copyReport);
-    $('#btnLinkedin')?.addEventListener('click', shareLinkedIn);
-    $('#btnPrint')?.addEventListener('click', printToPdf);
-
-    // boot
-    setProgress(1);
+  // ====== WIRING ======
+  // nav
+  document.querySelector('.nav').addEventListener('click', (e)=>{
+    const btn=e.target.closest('button[data-goto]'); if(!btn) return;
+    showPage(Number(btn.dataset.goto));
+  });
+  // identité
+  $('#btnIdentify').addEventListener('click', registerIdentity);
+  // secteurs controls
+  $('#btnAddSector').addEventListener('click', addSector);
+  $('#btnAddCompany').addEventListener('click', addCompany);
+  $('#btnApprenticeship').addEventListener('click', showApprenticeship);
+  $('#btnInterim').addEventListener('click', showInterim);
+  $('#btnEditMode').addEventListener('click', ()=>{
+    editMode = !editMode;
+    $('#btnEditMode').textContent = `✏️ Mode édition : ${editMode?'ON':'OFF'}`;
     renderSectors();
-    renderBadges();
-  </script>
+  });
+
+  // gamif actions
+  $('#btnEcoValidate').addEventListener('click', ()=>{
+    const pts = ecoPoints();
+    $('#ecoScore').textContent = pts;
+    if(pts>0){ awardBadgeOnce('eco'); updateScore(pts); }
+  });
+  $('#kmWalk').addEventListener('input', updateEcoScore);
+  $('#kmBike').addEventListener('input', updateEcoScore);
+  $('#usedTransit').addEventListener('change', updateEcoScore);
+  $('#usedCarpool').addEventListener('change', updateEcoScore);
+
+  // badges init
+  function updateReportAndGamif(){ renderBadges(); updateScoreUI(); renderReport(); }
+  renderSectors(); renderBadges(); renderReport(); updateScoreUI();
+
+  // Bilan & share boutons
+  $('#btnCopy')?.addEventListener('click', copyReport);
+  $('#btnLinkedin')?.addEventListener('click', shareLinkedIn);
+  $('#btnShare')?.addEventListener('click', shareGeneric);
+  $('#btnQr')?.addEventListener('click', makeQR);
+
+  // PDF
+  $('#btnPrint')?.addEventListener('click', printToPdf);
+  $('#btnPdfShare')?.addEventListener('click', shareGeneric);
+</script>
 </body>
 </html>
