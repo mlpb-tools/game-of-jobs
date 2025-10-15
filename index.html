@@ -2,11 +2,10 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Serious Game - Missions Locales</title>
-  <!-- Polices : alternatives web si indisponibles -->
-  <link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet"> <!-- Remplace Politica -->
-  <link href="https://fonts.googleapis.com/css2?family=Akrobat:wght@700&display=swap" rel="stylesheet"> <!-- Peut être remplacé par Oswald si indisponible -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escape Game Pro – Mission Forum</title>
+  <!-- Polices (remplace Politica/Akrobat par Oswald si indisponible sur Google Fonts) -->
+  <link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
       --orange: #f39200;
@@ -16,35 +15,69 @@
       --violet: #a3195b;
       --rouge: #9f3d3f;
       --noir: #171718;
-      --font-titre: 'Oswald', Arial, sans-serif;
+      --font-titre: 'Oswald', Arial, sans-serif; /* Remplace Politica */
       --font-texte: 'Muli', Arial, sans-serif;
-      --font-badge: 'Akrobat', 'Oswald', Arial, sans-serif;
+      --font-badge: 'Oswald', Arial, sans-serif; /* Remplace Akrobat */
     }
     body {
-      font-family: var(--font-texte);
-      background: #fff;
-      color: var(--noir);
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: var(--font-texte);
+      background: #f5f5f5;
+      min-height: 100%;
+      overflow-x: hidden;
+      position: relative;
     }
-    header {
-      background: var(--bleu);
-      color: #fff;
-      padding: 2rem 1rem 1rem 1rem;
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background:
+        radial-gradient(circle at 15% 20%, #f39200 0%, transparent 25%),
+        radial-gradient(circle at 85% 80%, #2897d5 0%, transparent 30%),
+        linear-gradient(45deg, transparent 40%, #95c11f 40%, #95c11f 60%, transparent 60%),
+        conic-gradient(from 45deg at 70% 30%, transparent 0deg, #d60b52 90deg, transparent 180deg);
+      opacity: 0.12;
+      z-index: -2;
+    }
+    html { height: 100%; }
+    .container { min-height: 100%; position: relative; }
+
+    /* Bandeau supprimé : PAS de logo/nom */
+
+    /* Page header */
+    .page-header {
       text-align: center;
-      font-family: var(--font-titre);
+      margin-bottom: 30px;
     }
-    .intro {
-      margin: 2rem auto;
-      max-width: 700px;
+    .page-title {
+      font-family: var(--font-titre);
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--noir);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 10px;
+      display: inline-block;
+      position: relative;
+    }
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px; left: 0; width: 60%; height: 6px;
       background: var(--orange);
-      color: #fff;
-      padding: 2rem;
-      border-radius: 1rem;
-      font-size: 1.2rem;
-      font-family: var(--font-titre);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 10px 100%);
     }
+    .page-subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Frise de progression */
     .frise {
       margin: 2rem 0;
       height: 60px;
@@ -69,285 +102,178 @@
       text-shadow: 0 2px 6px rgba(0,0,0,0.15);
       opacity: 1;
     }
-    .etapes {
+
+    /* Badges et pictos */
+    .badges-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin: 40px 0;
+    }
+    .badge-sticker {
+      background: white;
+      border: 5px solid var(--noir);
+      border-radius: 50%;
+      width: 120px; height: 120px;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
-      margin: 2rem auto;
-      max-width: 900px;
-    }
-    .etape {
-      background: #f7f7f7;
-      border-left: 10px solid var(--bleu);
-      border-radius: 0.7rem;
-      padding: 1.5rem 2rem;
-      position: relative;
-      font-family: var(--font-texte);
-      display: none;
-    }
-    .etape.active {
-      display: block;
-      animation: fadeIn 0.7s;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(40px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-    .etape[data-color="orange"] { border-color: var(--orange);}
-    .etape[data-color="vert"] { border-color: var(--vert);}
-    .etape[data-color="bleu"] { border-color: var(--bleu);}
-    .etape[data-color="rose"] { border-color: var(--rose);}
-    .etape[data-color="violet"] { border-color: var(--violet);}
-    .etape[data-color="rouge"] { border-color: var(--rouge);}
-    .etape h2 {
-      font-family: var(--font-titre);
-      margin-top: 0;
-      color: var(--noir);
-    }
-    .actions {
-      margin-top: 1.5rem;
-    }
-    .actions button {
-      background: var(--bleu);
-      color: #fff;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      border-radius: 2rem;
-      font-family: var(--font-titre);
-      font-size: 1.1rem;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      margin-right: 1rem;
-      margin-bottom: 0.5rem;
-      transition: background 0.2s;
-    }
-    .actions button:hover {
-      background: var(--orange);
-    }
-    .badges {
-      margin: 1.5rem 0;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .badge {
-      background: var(--rose);
-      color: #fff;
-      font-family: var(--font-badge);
-      padding: 0.7rem 1.2rem;
-      border-radius: 2rem;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      opacity: 0.5;
-      transition: opacity 0.3s;
-    }
-    .badge.unlocked {
-      opacity: 1;
-      background: var(--vert);
-    }
-    .badge.success { background: var(--vert);}
-    .badge.challenge { background: var(--violet);}
-    .badge.mobility { background: var(--bleu);}
-    .badge.collab { background: var(--orange);}
-    .badge.bilan { background: var(--rose);}
-    .progression {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 2rem 0;
-      justify-content: center;
-    }
-    .progression .step {
-      width: 40px;
-      height: 40px;
-      background: var(--vert);
-      color: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-badge);
-      font-size: 1.3rem;
-      border: 3px solid #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       position: relative;
-      opacity: 0.5;
-      transition: opacity 0.3s;
+      box-shadow: 6px 6px 0px rgba(0,0,0,0.2);
+      margin: 0 auto;
+      font-family: var(--font-badge);
+      font-size: 1.1rem;
     }
-    .progression .step.completed {
-      background: var(--bleu);
-      opacity: 1;
+    .badge-sticker.unlocked {
+      background: linear-gradient(135deg, var(--orange), var(--vert));
+      color: white;
+      border-color: var(--vert);
     }
-    .progression .line {
-      width: 60px;
-      height: 4px;
-      background: var(--bleu);
-    }
+    .badge-icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .badge-name { font-weight: 800; font-size: 0.9rem; text-align: center; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.05em; }
+
     /* Bouton PDF */
-    .pdf-btn {
-      display: none;
-      margin: 2rem auto;
-      background: var(--bleu);
-      color: #fff;
+    .action-btn {
+      background: linear-gradient(45deg, var(--bleu), var(--d60b52));
+      color: white;
       border: none;
-      padding: 1rem 2rem;
-      border-radius: 2rem;
-      font-family: var(--font-titre);
-      font-size: 1.1rem;
+      padding: 18px 35px;
+      border-radius: 30px;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
-    }
-    .pdf-btn.active {
+      transition: all 0.3s ease;
+      font-size: 1.1rem;
+      border: 3px solid white;
+      margin: 2rem auto 1rem auto;
       display: block;
+      font-family: var(--font-titre);
     }
-    /* Iconographie (exemple pictos SVG inline) */
-    .picto {
-      width: 28px;
-      height: 28px;
-      vertical-align: middle;
+    .action-btn:hover {
+      background: var(--orange);
+      color: white;
+      transform: scale(1.08);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
     }
+
     /* Responsive */
     @media (max-width: 700px) {
-      .etapes, .intro, .frise { max-width: 97vw; }
+      .page-title { font-size: 2rem; }
+      .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
       .frise { padding: 0 0.3rem; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Serious Game - Salon de l’Emploi</h1>
-  </header>
+<div class="container">
 
-  <section class="intro">
-    <strong>Bienvenue !</strong><br>
-    Objectif du jeu : Découvrir les métiers, valoriser tes compétences et relever des challenges pour booster ton avenir professionnel.<br>
-    <span style="font-family: var(--font-texte); font-size: 1rem;">Engage-toi dans ce parcours, gagne des badges, et obtiens ton bilan personnalisé à la fin !</span>
-  </section>
-
-  <div class="frise">
-    <div class="frise-step active" id="frise-0">Orientation</div>
-    <div class="frise-step" id="frise-1">Découverte</div>
-    <div class="frise-step" id="frise-2">Challenge</div>
-    <div class="frise-step" id="frise-3">Bilan</div>
+  <!-- PAGE 1 : Plan du Forum (sans bandeau logo/nom) -->
+  <div class="page active" id="page1">
+    <div class="page-header">
+      <h1 class="page-title">Plan du forum</h1>
+      <p class="page-subtitle">Clique sur chaque secteur pour découvrir les entreprises</p>
+    </div>
+    <div class="frise">
+      <div class="frise-step active">Orientation</div>
+      <div class="frise-step">Découverte</div>
+      <div class="frise-step">Challenge</div>
+      <div class="frise-step">Bilan</div>
+    </div>
+    <!-- ... ici le contenu du plateau de jeu, secteurs, pictos, etc. ... -->
   </div>
 
-  <div class="progression" id="progression">
-    <div class="step completed" id="step-0">1</div>
-    <div class="line"></div>
-    <div class="step" id="step-1">2</div>
-    <div class="line"></div>
-    <div class="step" id="step-2">3</div>
-    <div class="line"></div>
-    <div class="step" id="step-3">4</div>
+  <!-- ... autres pages du jeu ... -->
+
+  <!-- PAGE 5 : Validation & Bilan -->
+  <div class="page" id="page5">
+    <div class="page-header">
+      <h1 class="page-title">Validation finale</h1>
+      <p class="page-subtitle">Bravo, tu as terminé le serious game !</p>
+    </div>
+    <div class="frise">
+      <div class="frise-step">Orientation</div>
+      <div class="frise-step">Découverte</div>
+      <div class="frise-step">Challenge</div>
+      <div class="frise-step active">Bilan</div>
+    </div>
+    <div class="validation-container">
+      <h2 style="color:#f39200;font-family:var(--font-titre);">Bilan Visuel - Serious Game</h2>
+      <div class="badges-grid">
+        <div class="badge-sticker unlocked" style="border-color:#2897d5;">
+          <div class="badge-icon">🎯</div>
+          <div class="badge-name">Premier Contact</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#f39200;">
+          <div class="badge-icon">💬</div>
+          <div class="badge-name">Communicateur</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#95c11f;">
+          <div class="badge-icon">🤝</div>
+          <div class="badge-name">Collaboration</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#d60b52;">
+          <div class="badge-icon">🚀</div>
+          <div class="badge-name">Challenge</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#a3195b;">
+          <div class="badge-icon">🌍</div>
+          <div class="badge-name">Mobilité</div>
+        </div>
+      </div>
+      <button class="action-btn" onclick="downloadBilanPDF()">Télécharger mon bilan visuel (PDF)</button>
+    </div>
   </div>
 
-  <section class="etapes">
-    <div class="etape active" data-color="orange" id="etape-0">
-      <h2>Mission 1 : Découvrir les métiers</h2>
-      <p>Explore différents secteurs, rencontre des professionnels et identifie les métiers qui t’inspirent.</p>
-      <div class="badges">
-        <span class="badge challenge" id="badge-0"><svg class="picto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff" /><text x="12" y="16" font-size="12" text-anchor="middle" fill="#d60b52">M</text></svg> Découverte</span>
-      </div>
-      <div class="actions">
-        <button onclick="nextEtape()">Je valide cette mission</button>
-      </div>
-    </div>
-    <div class="etape" data-color="vert" id="etape-1">
-      <h2>Mission 2 : Valoriser tes compétences</h2>
-      <p>Participe à des ateliers, réalise des mini-défis et gagne des badges de compétence.</p>
-      <div class="badges">
-        <span class="badge success" id="badge-1"><svg class="picto" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" fill="#fff"/><text x="12" y="16" font-size="12" text-anchor="middle" fill="#95c11f">C</text></svg> Compétence</span>
-      </div>
-      <div class="actions">
-        <button onclick="nextEtape()">Je valide cette mission</button>
-      </div>
-    </div>
-    <div class="etape" data-color="bleu" id="etape-2">
-      <h2>Mission 3 : Challenge collaboratif</h2>
-      <p>Travaille en équipe, relève des défis et découvre l’importance de la collaboration et de la mobilité.</p>
-      <div class="badges">
-        <span class="badge collab" id="badge-2"><svg class="picto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><text x="12" y="16" font-size="12" text-anchor="middle" fill="#f39200">Co</text></svg> Collaboration</span>
-        <span class="badge mobility" id="badge-3"><svg class="picto" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" fill="#fff"/><text x="12" y="16" font-size="12" text-anchor="middle" fill="#2897d5">M</text></svg> Mobilité</span>
-      </div>
-      <div class="actions">
-        <button onclick="nextEtape()">Je valide cette mission</button>
-      </div>
-    </div>
-    <div class="etape" data-color="rose" id="etape-3">
-      <h2>Mission 4 : Ton bilan personnalisé</h2>
-      <p>Obtiens un bilan visuel de ton parcours, avec tes badges et réussites, téléchargeable en PDF.</p>
-      <div class="badges">
-        <span class="badge bilan" id="badge-4"><svg class="picto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#fff"/><text x="12" y="16" font-size="12" text-anchor="middle" fill="#d60b52">B</text></svg> Bilan</span>
-      </div>
-      <div class="actions">
-        <button class="pdf-btn active" onclick="downloadPDF()">Télécharger mon bilan visuel (PDF)</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section à exporter en PDF -->
+  <!-- Section cachée pour export PDF -->
   <div id="bilan-pdf" style="display:none;">
-    <header style="background:var(--bleu);color:#fff;padding:1rem;text-align:center;font-family:var(--font-titre);">
-      <h1>Bilan Visuel - Serious Game</h1>
-    </header>
-    <div style="padding:2rem;">
-      <h2 style="color:var(--orange);font-family:var(--font-titre);">Bravo pour ton engagement !</h2>
-      <p style="font-family:var(--font-texte);">Voici le récapitulatif de ton parcours au Salon de l’Emploi :</p>
-      <ul style="font-family:var(--font-texte);font-size:1.1rem;">
-        <li>Découverte des métiers : <span style="color:var(--rose);font-family:var(--font-badge);">Badge Découverte</span></li>
-        <li>Valorisation des compétences : <span style="color:var(--vert);font-family:var(--font-badge);">Badge Compétence</span></li>
-        <li>Challenge collaboratif : <span style="color:var(--orange);font-family:var(--font-badge);">Badge Collaboration</span></li>
-        <li>Mobilité : <span style="color:var(--bleu);font-family:var(--font-badge);">Badge Mobilité</span></li>
-      </ul>
+    <div class="validation-container">
+      <h2 style="color:#f39200;font-family:var(--font-titre);">Bilan Visuel - Serious Game</h2>
+      <div class="badges-grid">
+        <div class="badge-sticker unlocked" style="border-color:#2897d5;">
+          <div class="badge-icon">🎯</div>
+          <div class="badge-name">Premier Contact</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#f39200;">
+          <div class="badge-icon">💬</div>
+          <div class="badge-name">Communicateur</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#95c11f;">
+          <div class="badge-icon">🤝</div>
+          <div class="badge-name">Collaboration</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#d60b52;">
+          <div class="badge-icon">🚀</div>
+          <div class="badge-name">Challenge</div>
+        </div>
+        <div class="badge-sticker unlocked" style="border-color:#a3195b;">
+          <div class="badge-icon">🌍</div>
+          <div class="badge-name">Mobilité</div>
+        </div>
+      </div>
       <div style="margin-top:2rem;">
-        <span style="background:var(--orange);color:#fff;padding:0.5rem 1rem;border-radius:1rem;font-family:var(--font-badge);">Total badges : 4</span>
+        <span style="background:var(--orange);color:#fff;padding:0.5rem 1rem;border-radius:1rem;font-family:var(--font-badge);">Total badges : 5</span>
       </div>
     </div>
   </div>
 
-  <!-- html2pdf.js CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script>
-    let currentEtape = 0;
-    const totalEtapes = 4;
-
-    function nextEtape() {
-      // Cache l'étape actuelle
-      document.getElementById('etape-' + currentEtape).classList.remove('active');
-      // Débloque le badge
-      let badge = document.getElementById('badge-' + currentEtape);
-      if (badge) badge.classList.add('unlocked');
-      // Met à jour la frise
-      document.getElementById('frise-' + currentEtape).classList.remove('active');
-      if (currentEtape + 1 < totalEtapes) {
-        document.getElementById('frise-' + (currentEtape + 1)).classList.add('active');
-      }
-      // Met à jour la progression
-      document.getElementById('step-' + currentEtape).classList.add('completed');
-      if (currentEtape + 1 < totalEtapes) {
-        document.getElementById('step-' + (currentEtape + 1)).classList.add('completed');
-      }
-      // Affiche la prochaine étape
-      currentEtape++;
-      if (currentEtape < totalEtapes) {
-        document.getElementById('etape-' + currentEtape).classList.add('active');
-      }
-    }
-
-    function downloadPDF() {
-      var bilan = document.getElementById('bilan-pdf');
-      bilan.style.display = 'block';
-      html2pdf().from(bilan).set({
-        margin: 0,
-        filename: 'bilan_serious_game.pdf',
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-      }).save().then(() => {
-        bilan.style.display = 'none';
-      });
-    }
-  </script>
+</div>
+<!-- html2pdf.js pour export PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+function downloadBilanPDF() {
+  var bilan = document.getElementById('bilan-pdf');
+  bilan.style.display = 'block';
+  html2pdf().from(bilan).set({
+    margin: 0,
+    filename: 'bilan_serious_game.pdf',
+    html2canvas: { scale: 2 },
+    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+  }).save().then(() => {
+    bilan.style.display = 'none';
+  });
+}
+</script>
 </body>
 </html>
