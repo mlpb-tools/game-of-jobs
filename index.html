@@ -1,279 +1,565 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Escape Game Pro – Mission Forum</title>
-  <!-- Polices (remplace Politica/Akrobat par Oswald si indisponible sur Google Fonts) -->
-  <link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;700&family=Oswald:wght@700&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Serious Game – Forum Mission Locale</title>
+
+  <!-- POLICES : remplace les src: url(... .woff2) par tes fichiers si tu les as -->
   <style>
-    :root {
-      --orange: #f39200;
-      --vert: #95c11f;
-      --bleu: #2897d5;
-      --rose: #d60b52;
-      --violet: #a3195b;
-      --rouge: #9f3d3f;
-      --noir: #171718;
-      --font-titre: 'Oswald', Arial, sans-serif; /* Remplace Politica */
-      --font-texte: 'Muli', Arial, sans-serif;
-      --font-badge: 'Oswald', Arial, sans-serif; /* Remplace Akrobat */
+    /* ——— FONTS ——— */
+    @font-face {
+      font-family: "Politica";
+      src: local("Politica"), local("Politica-Bold");
+      font-weight: 700; font-style: normal; font-display: swap;
     }
-    body {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: var(--font-texte);
-      background: #f5f5f5;
-      min-height: 100%;
-      overflow-x: hidden;
-      position: relative;
+    @font-face {
+      font-family: "Muli";
+      src: local("Muli"), local("Mulish Regular");
+      font-weight: 400; font-style: normal; font-display: swap;
     }
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+    @font-face {
+      font-family: "Akrobat";
+      src: local("Akrobat"), local("Akrobat Bold");
+      font-weight: 700; font-style: normal; font-display: swap;
+    }
+
+    :root{
+      /* Palette officielle */
+      --orange:#f39200; --green:#95c11f; --blue:#2897d5; --pink:#d60b52;
+      --violet:#a3195b; --brick:#9f3d3f; --ink:#171718;
+      /* UI */
+      --card:#ffffff; --line:#e6e8ee; --muted:#5a6473; --bg:#f8fafc;
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font-family:"Muli", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+
+    /* ——— HEADER ——— */
+    .brandbar{
       background:
-        radial-gradient(circle at 15% 20%, #f39200 0%, transparent 25%),
-        radial-gradient(circle at 85% 80%, #2897d5 0%, transparent 30%),
-        linear-gradient(45deg, transparent 40%, #95c11f 40%, #95c11f 60%, transparent 60%),
-        conic-gradient(from 45deg at 70% 30%, transparent 0deg, #d60b52 90deg, transparent 180deg);
-      opacity: 0.12;
-      z-index: -2;
+        linear-gradient(135deg, var(--orange), var(--green) 35%, var(--blue));
+      color:#fff; padding:18px 16px; text-align:center; position:relative;
+      box-shadow: inset 0 -8px 0 rgba(0,0,0,.08);
     }
-    html { height: 100%; }
-    .container { min-height: 100%; position: relative; }
-
-    /* Bandeau supprimé : PAS de logo/nom */
-
-    /* Page header */
-    .page-header {
-      text-align: center;
-      margin-bottom: 30px;
+    .brandbar .title{
+      margin:0; font: 700 28px/1.1 "Politica", "Muli", sans-serif; letter-spacing:.5px;
+      text-shadow: 0 1px 0 rgba(0,0,0,.25);
     }
-    .page-title {
-      font-family: var(--font-titre);
-      font-size: 2.8rem;
-      font-weight: 700;
-      color: var(--noir);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 10px;
-      display: inline-block;
-      position: relative;
-    }
-    .page-title::after {
-      content: '';
-      position: absolute;
-      bottom: -10px; left: 0; width: 60%; height: 6px;
-      background: var(--orange);
-      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 10px 100%);
-    }
-    .page-subtitle {
-      font-size: 1.1rem;
-      color: #666;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .brandbar .subtitle{
+      margin:6px 0 0; opacity:.95; font-weight:600;
     }
 
-    /* Frise de progression */
-    .frise {
-      margin: 2rem 0;
-      height: 60px;
-      background: linear-gradient(90deg, var(--orange), var(--bleu), var(--vert), var(--rose));
-      border-radius: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      color: #fff;
-      font-family: var(--font-badge);
-    }
-    .frise .frise-step {
-      text-align: center;
-      flex: 1;
-      opacity: 0.5;
-      transition: opacity 0.3s;
-    }
-    .frise .frise-step.active {
-      font-weight: bold;
-      font-size: 1.2rem;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      opacity: 1;
+    /* ——— CONTAINER ——— */
+    .container{max-width:1100px; margin:24px auto 120px; padding:0 16px}
+    .page{display:none}
+    .page.active{display:block}
+    .card{
+      background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      padding:20px; box-shadow: 0 8px 24px rgba(0,0,0,.04);
     }
 
-    /* Badges et pictos */
-    .badges-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 30px;
-      margin: 40px 0;
+    /* ——— FRise / Progression ——— */
+    .timeline{
+      display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:18px 0;
     }
-    .badge-sticker {
-      background: white;
-      border: 5px solid var(--noir);
-      border-radius: 50%;
-      width: 120px; height: 120px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      position: relative;
-      box-shadow: 6px 6px 0px rgba(0,0,0,0.2);
-      margin: 0 auto;
-      font-family: var(--font-badge);
-      font-size: 1.1rem;
+    .step{
+      position:relative; padding:12px; border-radius:12px; text-align:center;
+      background:#fff; border:2px solid var(--line);
+      font-weight:800;
     }
-    .badge-sticker.unlocked {
-      background: linear-gradient(135deg, var(--orange), var(--vert));
-      color: white;
-      border-color: var(--vert);
-    }
-    .badge-icon { font-size: 2.2rem; margin-bottom: 10px; }
-    .badge-name { font-weight: 800; font-size: 0.9rem; text-align: center; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.05em; }
+    .step[data-status="done"]{ border-color:var(--green); box-shadow:0 0 0 4px rgba(149,193,31,.15) inset}
+    .step[data-status="curr"]{ border-color:var(--blue); box-shadow:0 0 0 4px rgba(40,151,213,.15) inset}
+    .step .k{display:block; font-family:"Akrobat","Muli",sans-serif; font-size:22px}
 
-    /* Bouton PDF */
-    .action-btn {
-      background: linear-gradient(45deg, var(--bleu), var(--d60b52));
-      color: white;
-      border: none;
-      padding: 18px 35px;
-      border-radius: 30px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-size: 1.1rem;
-      border: 3px solid white;
-      margin: 2rem auto 1rem auto;
-      display: block;
-      font-family: var(--font-titre);
+    /* ——— IDENTITÉ ——— */
+    .id-row{display:flex; gap:12px; flex-wrap:wrap}
+    .id-row input{
+      flex:1 1 240px; padding:12px 14px; border:2px solid var(--line); border-radius:12px; font-size:16px;
+      outline:none;
     }
-    .action-btn:hover {
-      background: var(--orange);
-      color: white;
-      transform: scale(1.08);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    .id-row input:focus{border-color:var(--blue); box-shadow:0 0 0 4px rgba(40,151,213,.15)}
+
+    /* ——— BOUTONS ——— */
+    .btn{
+      appearance:none; border:none; cursor:pointer; color:#fff; padding:14px 18px; border-radius:12px;
+      font:800 14px/1 "Muli",sans-serif; letter-spacing:.3px;
+      background:linear-gradient(135deg, var(--blue), var(--green)); box-shadow:0 6px 0 #1a365d;
+      transition:transform .15s ease, filter .15s ease;
+    }
+    .btn:hover{transform:translateY(-1px); filter:brightness(1.05)}
+    .btn.secondary{background:linear-gradient(135deg, var(--orange), var(--pink)); box-shadow:0 6px 0 #7a1a1f}
+    .btn.dark{background:linear-gradient(135deg, #2d3748, #1a365d); box-shadow:0 6px 0 #0b203a}
+    .btn.ghost{
+      background:#fff; color:var(--ink); border:2px solid var(--line); box-shadow:none;
     }
 
-    /* Responsive */
-    @media (max-width: 700px) {
-      .page-title { font-size: 2rem; }
-      .badges-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
-      .frise { padding: 0 0.3rem; }
+    /* ——— SECTEURS / PARCOURS ——— */
+    .sectors{display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr))}
+    .sector{
+      border-radius:16px; padding:18px;
+      background:linear-gradient(135deg, rgba(149,193,31,.12), rgba(40,151,213,.10));
+      border:2px solid var(--green); cursor:pointer; transition:transform .2s ease, box-shadow .2s ease;
+    }
+    .sector:hover{transform:translateY(-3px); box-shadow:0 10px 20px rgba(0,0,0,.10)}
+    .sector h3{margin:0 0 6px 0; font:700 18px/1.2 "Politica","Muli",sans-serif}
+    .company{background:#fff; border:1px solid var(--line); border-radius:12px; padding:12px; margin-top:10px}
+    .company .name{font-weight:900; color:var(--green)}
+    .jobs{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px}
+    .job{background:var(--blue); color:#fff; border:none; padding:4px 10px; border-radius:999px; font-size:12px; cursor:pointer}
+
+    /* ——— BADGES ——— */
+    .badges{display:grid; gap:16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))}
+    .badge{
+      background:linear-gradient(135deg, rgba(243,146,0,.14), rgba(163,25,91,.10));
+      border:2px solid var(--orange); border-radius:16px; padding:18px; text-align:center
+    }
+    .badge .em{font-size:36px}
+    .badge .title{margin:.5rem 0 0; font:700 18px/1 "Akrobat","Muli",sans-serif}
+    .badge .desc{opacity:.9}
+    .badge .count{margin-top:8px; font:900 18px/1 "Akrobat","Muli",sans-serif}
+    .badge.earned{border-color:var(--green); box-shadow:0 0 0 4px rgba(149,193,31,.2) inset}
+
+    /* ——— STATS ——— */
+    .stats{display:grid; gap:12px; grid-template-columns: repeat(4, minmax(0,1fr))}
+    @media (max-width:900px){.stats{grid-template-columns: repeat(2, minmax(0,1fr))}}
+    .stat{
+      background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; text-align:center
+    }
+    .stat .num{font:900 30px/1 "Akrobat","Muli",sans-serif}
+
+    /* ——— NAV ——— */
+    .nav{
+      position:fixed; left:50%; bottom:18px; transform:translateX(-50%);
+      display:flex; gap:10px; z-index:1000;
+      background:#fff; border:1px solid var(--line); border-radius:14px; padding:8px;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+    }
+    .nav button{
+      width:52px; height:52px; border-radius:12px; border:3px solid #1a365d;
+      background:linear-gradient(135deg, #2d3748, #1a365d); color:#fff; font:900 1rem/1 "Akrobat",sans-serif;
+      cursor:pointer; transition:all .15s ease;
+      box-shadow: inset 2px 2px 0 rgba(255,255,255,.15), inset -2px -2px 0 rgba(0,0,0,.45), 4px 4px 0 #2897d5;
+    }
+    .nav button:hover{background:linear-gradient(135deg, var(--blue), var(--green)); transform:rotate(-6deg) scale(1.06)}
+    .nav button[aria-current="page"]{background:linear-gradient(135deg, var(--orange), var(--pink));}
+
+    /* ——— TOAST ——— */
+    .notice{
+      position:fixed; top:20px; left:50%; transform:translateX(-50%);
+      max-width:480px; padding:14px 16px; border-radius:12px; color:#fff; background:var(--blue);
+      border:2px solid #1a365d; font-weight:700; text-align:center; box-shadow:0 12px 24px rgba(0,0,0,.2); z-index:2000; white-space:pre-line;
+      display:none;
+    }
+    .notice.ok{background:var(--green)} .notice.warn{background:var(--orange)} .notice.err{background:var(--pink)}
+
+    /* ——— PRINT (Page 5) ——— */
+    @media print {
+      body{background:#fff}
+      .nav, .brandbar{display:none !important}
+      .container > * {display:none !important}
+      #page5{display:block !important}
+      #reportCanvas, #reportVisual{break-inside:avoid}
+      .page-title, .page-subtitle{color:#000}
     }
   </style>
 </head>
 <body>
-<div class="container">
+  <header class="brandbar">
+    <h1 class="title">Serious Game – Forum Mission Locale</h1>
+    <p class="subtitle">Orientation • Découverte • Challenge — Ton parcours vers l’emploi</p>
+  </header>
 
-  <!-- PAGE 1 : Plan du Forum (sans bandeau logo/nom) -->
-  <div class="page active" id="page1">
-    <div class="page-header">
-      <h1 class="page-title">Plan du forum</h1>
-      <p class="page-subtitle">Clique sur chaque secteur pour découvrir les entreprises</p>
-    </div>
-    <div class="frise">
-      <div class="frise-step active">Orientation</div>
-      <div class="frise-step">Découverte</div>
-      <div class="frise-step">Challenge</div>
-      <div class="frise-step">Bilan</div>
-    </div>
-    <!-- ... ici le contenu du plateau de jeu, secteurs, pictos, etc. ... -->
-  </div>
+  <main class="container">
 
-  <!-- ... autres pages du jeu ... -->
+    <!-- PAGE 1 — INTRO + IDENTITÉ (Sans bouton logo/nom) -->
+    <section class="page active" id="page1" aria-labelledby="t1">
+      <div class="card">
+        <h2 id="t1" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
+          🎮 Objectif du jeu
+        </h2>
+        <p class="page-subtitle" style="margin:0 0 14px; color:var(--muted)">
+          Parcours les stands, découvre des métiers, crée des contacts et **gagne des badges**. Reviens au QG pour ton **bilan visuel**.
+        </p>
 
-  <!-- PAGE 5 : Validation & Bilan -->
-  <div class="page" id="page5">
-    <div class="page-header">
-      <h1 class="page-title">Validation finale</h1>
-      <p class="page-subtitle">Bravo, tu as terminé le serious game !</p>
-    </div>
-    <div class="frise">
-      <div class="frise-step">Orientation</div>
-      <div class="frise-step">Découverte</div>
-      <div class="frise-step">Challenge</div>
-      <div class="frise-step active">Bilan</div>
-    </div>
-    <div class="validation-container">
-      <h2 style="color:#f39200;font-family:var(--font-titre);">Bilan Visuel - Serious Game</h2>
-      <div class="badges-grid">
-        <div class="badge-sticker unlocked" style="border-color:#2897d5;">
-          <div class="badge-icon">🎯</div>
-          <div class="badge-name">Premier Contact</div>
+        <div class="timeline">
+          <div class="step" data-status="curr"><span class="k">1</span>Identification</div>
+          <div class="step"><span class="k">2</span>Explorer</div>
+          <div class="step"><span class="k">3</span>Valider</div>
+          <div class="step"><span class="k">4</span>Bilan</div>
         </div>
-        <div class="badge-sticker unlocked" style="border-color:#f39200;">
-          <div class="badge-icon">💬</div>
-          <div class="badge-name">Communicateur</div>
-        </div>
-        <div class="badge-sticker unlocked" style="border-color:#95c11f;">
-          <div class="badge-icon">🤝</div>
-          <div class="badge-name">Collaboration</div>
-        </div>
-        <div class="badge-sticker unlocked" style="border-color:#d60b52;">
-          <div class="badge-icon">🚀</div>
-          <div class="badge-name">Challenge</div>
-        </div>
-        <div class="badge-sticker unlocked" style="border-color:#a3195b;">
-          <div class="badge-icon">🌍</div>
-          <div class="badge-name">Mobilité</div>
+
+        <div class="id-row">
+          <input id="firstName" placeholder="Prénom" autocomplete="given-name" />
+          <input id="lastName" placeholder="Nom" autocomplete="family-name" />
+          <button class="btn" id="btnIdentify" type="button" title="Valider l'identité">Je démarre la mission</button>
         </div>
       </div>
-      <button class="action-btn" onclick="downloadBilanPDF()">Télécharger mon bilan visuel (PDF)</button>
-    </div>
-  </div>
 
-  <!-- Section cachée pour export PDF -->
-  <div id="bilan-pdf" style="display:none;">
-    <div class="validation-container">
-      <h2 style="color:#f39200;font-family:var(--font-titre);">Bilan Visuel - Serious Game</h2>
-      <div class="badges-grid">
-        <div class="badge-sticker unlocked" style="border-color:#2897d5;">
-          <div class="badge-icon">🎯</div>
-          <div class="badge-name">Premier Contact</div>
+      <div style="display:grid; gap:14px; grid-template-columns:1.2fr .8fr; margin-top:14px">
+        <div class="card">
+          <h3 style="margin:0 0 6px; font:700 20px/1 'Politica','Muli',sans-serif; color:var(--ink)">Règles du jeu</h3>
+          <ul style="margin:8px 0 0 18px; line-height:1.5">
+            <li>Visiter **au moins 3 secteurs**.</li>
+            <li>Établir **5 contacts** entreprise.</li>
+            <li>Retourner au **QG** pour valider tes **badges**.</li>
+            <li>Exporter ton **bilan visuel** (PDF) en Page 5.</li>
+          </ul>
         </div>
-        <div class="badge-sticker unlocked" style="border-color:#f39200;">
-          <div class="badge-icon">💬</div>
-          <div class="badge-name">Communicateur</div>
-        </div>
-        <div class="badge-sticker unlocked" style="border-color:#95c11f;">
-          <div class="badge-icon">🤝</div>
-          <div class="badge-name">Collaboration</div>
-        </div>
-        <div class="badge-sticker unlocked" style="border-color:#d60b52;">
-          <div class="badge-icon">🚀</div>
-          <div class="badge-name">Challenge</div>
-        </div>
-        <div class="badge-sticker unlocked" style="border-color:#a3195b;">
-          <div class="badge-icon">🌍</div>
-          <div class="badge-name">Mobilité</div>
+        <div class="card" style="border-left:6px solid var(--blue)">
+          <h3 style="margin:0 0 6px; font:700 20px/1 'Politica','Muli',sans-serif; color:var(--ink)">Conseil Mission Locale</h3>
+          <p style="margin:0">Appuie-toi sur tes <strong>compétences</strong> (Life Skills), présente ton projet et **ose poser des questions**.</p>
         </div>
       </div>
-      <div style="margin-top:2rem;">
-        <span style="background:var(--orange);color:#fff;padding:0.5rem 1rem;border-radius:1rem;font-family:var(--font-badge);">Total badges : 5</span>
-      </div>
-    </div>
-  </div>
+    </section>
 
-</div>
-<!-- html2pdf.js pour export PDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script>
-function downloadBilanPDF() {
-  var bilan = document.getElementById('bilan-pdf');
-  bilan.style.display = 'block';
-  html2pdf().from(bilan).set({
-    margin: 0,
-    filename: 'bilan_serious_game.pdf',
-    html2canvas: { scale: 2 },
-    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-  }).save().then(() => {
-    bilan.style.display = 'none';
-  });
-}
-</script>
+    <!-- PAGE 2 — SECTEURS -->
+    <section class="page" id="page2" aria-labelledby="t2">
+      <div class="card">
+        <h2 id="t2" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
+          🗺️ Parcours des secteurs
+        </h2>
+        <p class="page-subtitle" style="margin:0 0 10px; color:var(--muted)">
+          Clique sur les entreprises pour **enregistrer un contact** et gagner des progressions.
+        </p>
+        <div id="sectors" class="sectors"></div>
+      </div>
+    </section>
+
+    <!-- PAGE 3 — BADGES -->
+    <section class="page" id="page3" aria-labelledby="t3">
+      <div class="card">
+        <h2 id="t3" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
+          🏅 Mes badges
+        </h2>
+        <p class="page-subtitle" style="margin:0 0 10px; color:var(--muted)">
+          Collectionne tes badges en visitant et en contactant des entreprises.
+        </p>
+        <div id="badges" class="badges"></div>
+      </div>
+    </section>
+
+    <!-- PAGE 4 — BILAN (écran) -->
+    <section class="page" id="page4" aria-labelledby="t4">
+      <div class="card">
+        <h2 id="t4" class="page-title" style="font:700 26px/1.2 'Politica','Muli',sans-serif; margin:0 0 6px">
+          📊 Bilan de mission (écran)
+        </h2>
+        <div id="stats" class="stats" style="margin-top:8px"></div>
+        <div class="id-row" style="margin-top:16px">
+          <button class="btn" id="btnCopy">📋 Copier le bilan</button>
+          <button class="btn secondary" id="btnLinkedin">💼 Partager LinkedIn</button>
+          <button class="btn dark" data-goto="5">🖨️ Créer mon PDF</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE 5 — BILAN VISUEL (PDF) -->
+    <section class="page" id="page5" aria-labelledby="t5">
+      <div class="card" id="reportVisual" style="padding:24px">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:10px">
+          <div style="width:14px; height:54px; background:linear-gradient(180deg,var(--orange),var(--blue)); border-radius:8px"></div>
+          <div>
+            <h2 id="t5" class="page-title" style="margin:0; font:700 28px/1.1 'Politica','Muli',sans-serif">Bilan Serious Game – Forum Mission Locale</h2>
+            <p id="reportUser" style="margin:4px 0 0; font-weight:700">Participant : —</p>
+          </div>
+        </div>
+
+        <!-- Frise “mission accomplie” -->
+        <div class="timeline" style="margin:16px 0 8px">
+          <div class="step" data-status="done"><span class="k">1</span>Identification</div>
+          <div class="step" data-status="done"><span class="k">2</span>Explorer</div>
+          <div class="step" data-status="done"><span class="k">3</span>Valider</div>
+          <div class="step" data-status="done"><span class="k">4</span>Bilan</div>
+        </div>
+
+        <!-- Stats visuelles -->
+        <div class="stats" id="statsPdf" style="margin:8px 0 12px"></div>
+
+        <!-- Badges visuels -->
+        <div>
+          <h3 style="margin:10px 0 6px; font:700 20px/1 'Politica','Muli',sans-serif">Badges obtenus</h3>
+          <div class="badges" id="badgesPdf"></div>
+        </div>
+
+        <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:center">
+          <div style="font-size:12px; color:var(--muted)">Généré le <span id="reportDate"></span> — Mission Locale de France</div>
+          <button class="btn" id="btnPrint" type="button">📥 Télécharger en PDF</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- NAV -->
+  <nav class="nav" aria-label="Navigation pages">
+    <button type="button" data-goto="1" aria-current="page" title="Page 1">1</button>
+    <button type="button" data-goto="2" title="Page 2">2</button>
+    <button type="button" data-goto="3" title="Page 3">3</button>
+    <button type="button" data-goto="4" title="Page 4">4</button>
+    <button type="button" data-goto="5" title="Page 5">5</button>
+  </nav>
+
+  <!-- TOAST -->
+  <div id="toast" class="notice" role="status" aria-live="polite"></div>
+
+  <script>
+    // ====== STATE ======
+    const visitedSectors = new Set();
+    const contactedCompanies = new Set();
+    const badgesData = [
+      {id:'explorer',  title:'Explorateur', target:3, progress:0, icon:'🧭', description:'Visiter 3 secteurs'},
+      {id:'networker', title:'Networker',  target:5, progress:0, icon:'🤝', description:'Contacter 5 entreprises'},
+      {id:'complete',  title:'Identifié',  target:1, progress:0, icon:'✅', description:'Renseigner son identité'},
+      {id:'social',    title:'Ambassadeur',target:1, progress:0, icon:'📣', description:'Partager ses résultats'}
+    ];
+
+    const sectorsData = {
+      tech:{name:'Tech & Digital', icon:'💻', companies:[
+        {name:'WebDev Bayonne', desc:'Développement web', jobs:['Développeur','Designer','Chef de projet']},
+        {name:'DataSoft Biarritz', desc:'Data & IA', jobs:['Data Analyst','Dev Python','Consultant IA']}
+      ]},
+      resto:{name:'Restauration', icon:'🍽️', companies:[
+        {name:'Le Bistrot Basque', desc:'Cuisine traditionnelle', jobs:['Cuisinier','Serveur','Commis']},
+        {name:'Café des Halles', desc:'Café-brasserie', jobs:['Serveur','Barista','Plongeur']}
+      ]},
+      sante:{name:'Santé & Social', icon:'🏥', companies:[
+        {name:'EHPAD Ustaritz', desc:'Accompagnement des aînés', jobs:['Aide-soignant','AS','IDE']},
+        {name:'Centre Social BAB', desc:'Animation & lien social', jobs:['Animateur','Médiateur']}
+      ]},
+      transport:{name:'Transport & Logistique', icon:'🚛', companies:[
+        {name:'Logi64', desc:'Plateforme logistique', jobs:['Préparateur','Cariste']},
+        {name:'AdourTrans', desc:'Transport régional', jobs:['Conducteur','Livreur']}
+      ]}
+    };
+
+    // ====== HELPERS ======
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+
+    function toast(msg, type='info'){
+      const t = $('#toast');
+      t.className = 'notice ' + (type==='ok'?'ok':type==='warn'?'warn':type==='err'?'err':'');
+      t.textContent = msg; t.style.display='block';
+      clearTimeout(t._h); t._h = setTimeout(()=>{t.style.display='none'}, 2600);
+    }
+
+    function setProgress(stepIndex){ // 1..4
+      const nodes = $$('.timeline .step');
+      nodes.forEach((el,i)=>{
+        const idx = i+1;
+        el.setAttribute('data-status', idx < stepIndex ? 'done' : idx === stepIndex ? 'curr' : '');
+      });
+    }
+
+    function showPage(n){
+      $$('.page').forEach(p=>p.classList.toggle('active', p.id === 'page'+n));
+      $$('.nav button').forEach(b=>{
+        const on = b.dataset.goto === String(n);
+        b.setAttribute('aria-current', on ? 'page' : 'false');
+      });
+      if(n===2) { renderSectors(); setProgress(2); }
+      if(n===3) { renderBadges(); setProgress(3); }
+      if(n===4) { renderReport(); setProgress(4); }
+      if(n===5) { prepareReportVisual(); setProgress(4); }
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+
+    // ====== IDENTITÉ ======
+    function updateIdentity(){
+      const fn = $('#firstName').value.trim();
+      const ln = $('#lastName').value.trim();
+      if(fn && ln){ $('.subtitle').textContent = `Bienvenue ${fn} — c’est parti !`; }
+    }
+    function registerIdentity(){
+      const fn = $('#firstName').value.trim();
+      const ln = $('#lastName').value.trim();
+      if(!fn || !ln){ toast('Remplis d’abord ton prénom et ton nom.', 'warn'); return; }
+      updateBadge('complete', 1);
+      toast(`Bienvenue ${fn} ${ln} ! 🚀`, 'ok');
+      showPage(2);
+    }
+
+    // ====== SECTEURS ======
+    function renderSectors(){
+      const wrap = $('#sectors'); wrap.innerHTML='';
+      Object.entries(sectorsData).forEach(([key, sec])=>{
+        const card = document.createElement('article');
+        card.className='sector';
+        card.innerHTML = `<h3>${sec.icon} ${sec.name}</h3>`;
+        sec.companies.forEach(c=>{
+          const box = document.createElement('div');
+          box.className='company';
+          box.innerHTML = `
+            <div class="name">${c.name}</div>
+            <div>${c.desc}</div>
+            <div class="jobs">
+              ${c.jobs.map(j=>`<button class="job" type="button" data-company="${c.name}" data-sector="${key}" data-job="${j}">${j}</button>`).join('')}
+            </div>`;
+          // un click sur la carte = contact
+          box.addEventListener('click', ()=>{
+            contactedCompanies.add(c.name);
+            updateBadge('networker', contactedCompanies.size);
+            visitedSectors.add(sec.name);
+            updateBadge('explorer', visitedSectors.size);
+            toast(`✅ Contact avec ${c.name}`, 'ok');
+          });
+          card.appendChild(box);
+        });
+        wrap.appendChild(card);
+      });
+
+      // Click précis sur une "job pill"
+      wrap.addEventListener('click', (e)=>{
+        const btn = e.target.closest('.job');
+        if(!btn) return;
+        e.stopPropagation();
+        toast(`ℹ️ ${btn.dataset.job} @ ${btn.dataset.company}`);
+      });
+    }
+
+    // ====== BADGES ======
+    function updateBadge(id, progress){
+      const b = badgesData.find(x=>x.id===id);
+      if(!b) return;
+      const before = b.progress;
+      b.progress = Math.max(b.progress, progress);
+      if(before < b.target && b.progress >= b.target){
+        toast(`🏆 Badge obtenu : ${b.title}`, 'ok');
+      }
+      renderBadges();
+    }
+    function renderBadges(){
+      const wrap = $('#badges'); if(!wrap) return; wrap.innerHTML='';
+      badgesData.forEach(b=>{
+        const ok = b.progress >= b.target;
+        const el = document.createElement('div');
+        el.className = 'badge' + (ok ? ' earned' : '');
+        el.innerHTML = `
+          <div class="em">${b.icon}</div>
+          <div class="title">${b.title}</div>
+          <div class="desc">${b.description}</div>
+          <div class="count">${Math.min(b.progress,b.target)} / ${b.target}</div>`;
+        wrap.appendChild(el);
+      });
+    }
+
+    // ====== BILAN (écran) ======
+    function computeStats(){
+      const totalSectors = visitedSectors.size;
+      const totalContacts = contactedCompanies.size;
+      const totalBadges = badgesData.filter(b=>b.progress>=b.target).length;
+      const completionRate = Math.round((totalBadges / badgesData.length) * 100);
+      return {totalSectors,totalContacts,totalBadges,completionRate};
+    }
+    function renderReport(){
+      const s = computeStats();
+      const wrap = $('#stats'); wrap.innerHTML='';
+      const items = [
+        ['Secteurs visités', s.totalSectors],
+        ['Entreprises contactées', s.totalContacts],
+        ['Badges obtenus', s.totalBadges],
+        ['Taux de réussite', s.completionRate+'%']
+      ];
+      items.forEach(([label,val])=>{
+        const d = document.createElement('div'); d.className='stat';
+        d.innerHTML = `<div class="num">${val}</div><div>${label}</div>`;
+        wrap.appendChild(d);
+      });
+    }
+    function buildReportText(){
+      const fn = $('#firstName').value.trim(), ln = $('#lastName').value.trim();
+      const who = (fn && ln) ? `${fn} ${ln}` : 'Participant';
+      const s = computeStats();
+      return `BILAN FORUM
+Participant : ${who}
+Date : ${new Date().toLocaleDateString('fr-FR')}
+Heure : ${new Date().toLocaleTimeString('fr-FR')}
+
+STATISTIQUES
+• Secteurs visités : ${s.totalSectors}
+• Entreprises contactées : ${s.totalContacts}
+• Badges obtenus : ${s.totalBadges}/${badgesData.length}
+• Taux de réussite : ${s.completionRate}%
+
+— Mission Locale`;
+    }
+    async function copyReport(){
+      const text = buildReportText();
+      try{ await navigator.clipboard.writeText(text); updateBadge('social',1); toast('📋 Bilan copié !','ok'); }
+      catch{ toast('Impossible de copier automatiquement.','err'); }
+    }
+    function shareLinkedIn(){
+      const s = computeStats();
+      const text = `Je viens de participer au Forum Mission Locale ! ${s.totalSectors} secteurs, ${s.totalContacts} contacts, ${s.totalBadges} badges.`;
+      const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(location.href)}&title=${encodeURIComponent(text)}`;
+      window.open(url, '_blank','width=720,height=600,noopener');
+      updateBadge('social',1);
+    }
+
+    // ====== BILAN VISUEL (PDF – Page 5) ======
+    function prepareReportVisual(){
+      const fn = $('#firstName').value.trim(), ln = $('#lastName').value.trim();
+      $('#reportUser').textContent = `Participant : ${fn || '—'} ${ln || ''}`.trim();
+      $('#reportDate').textContent = new Date().toLocaleString('fr-FR');
+
+      // stats pdf
+      const s = computeStats();
+      const statsPdf = $('#statsPdf'); statsPdf.innerHTML='';
+      [
+        ['Secteurs visités', s.totalSectors],
+        ['Entreprises contactées', s.totalContacts],
+        ['Badges obtenus', s.totalBadges],
+        ['Taux de réussite', s.completionRate+'%']
+      ].forEach(([label,val])=>{
+        const d = document.createElement('div'); d.className='stat';
+        d.innerHTML = `<div class="num">${val}</div><div>${label}</div>`;
+        statsPdf.appendChild(d);
+      });
+
+      // badges pdf
+      const bpdf = $('#badgesPdf'); bpdf.innerHTML='';
+      badgesData.forEach(b=>{
+        const ok = b.progress >= b.target;
+        const el = document.createElement('div');
+        el.className = 'badge' + (ok ? ' earned' : '');
+        el.innerHTML = `
+          <div class="em">${b.icon}</div>
+          <div class="title">${b.title}</div>
+          <div class="desc">${b.description}</div>
+          <div class="count">${Math.min(b.progress,b.target)} / ${b.target}</div>`;
+        bpdf.appendChild(el);
+      });
+    }
+
+    function printToPdf(){ window.print(); }
+
+    // ====== WIRING ======
+    // nav
+    document.querySelector('.nav').addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-goto]');
+      if(!btn) return;
+      showPage(Number(btn.dataset.goto));
+    });
+
+    // identité
+    $('#firstName').addEventListener('input', updateIdentity);
+    $('#lastName').addEventListener('input', updateIdentity);
+    $('#btnIdentify').addEventListener('click', registerIdentity);
+
+    // actions
+    $('#btnCopy')?.addEventListener('click', copyReport);
+    $('#btnLinkedin')?.addEventListener('click', shareLinkedIn);
+    $('#btnPrint')?.addEventListener('click', printToPdf);
+
+    // boot
+    setProgress(1);
+    renderSectors();
+    renderBadges();
+  </script>
 </body>
 </html>
