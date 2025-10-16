@@ -2145,6 +2145,208 @@
                 <!-- Mission Locale - Quartier Général -->
                 <div class="headquarters" onclick="showStandInfo('mission')">
                     <div class="hq-building">
+                        <!-- ... (tout le reste du fichier inchangé) ... -->
+<div class="headquarters">
+    <div class="hq-building" id="hqBuilding">
+        <div class="hq-flag">🏳️‍🌈</div>
+        <h3>QG Mission Locale</h3>
+        <h4>Accompagnement & Infos</h4>
+        <div class="hq-services">
+            <span>🗣️ Orientation</span>
+            <span>💼 Coaching Emploi</span>
+            <span>📄 Conseils CV & Lettre</span>
+        </div>
+    </div>
+    <!-- Ajout du chat QG -->
+    <div class="mission-chat-window" id="missionChat" style="display:none;">
+        <div class="mission-chat-header">
+            <span>Mission Locale – QG</span>
+            <button class="mission-chat-close" id="closeMissionChat" title="Fermer le chat">×</button>
+        </div>
+        <div class="mission-chat-body" id="missionChatBody">
+            <div class="mission-chat-message qg">
+                💬 Si tu as des questions, on est là !
+            </div>
+        </div>
+        <form class="mission-chat-input" id="missionChatForm">
+            <input type="text" id="missionChatText" autocomplete="off" placeholder="Écris ta question..." required />
+            <button type="submit">Envoyer</button>
+        </form>
+    </div>
+</div>
+<!-- ... (suite du fichier inchangé, AVANT </body>) ... -->
+<style>
+/* Chat Mission Locale */
+.mission-chat-window {
+    position: fixed;
+    bottom: 35px;
+    right: 35px;
+    width: 340px;
+    max-width: 97vw;
+    background: #fff;
+    border: 3px solid #171718;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(40, 151, 213, 0.13), 0 2px 8px #f39200;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Muli', Arial, sans-serif;
+    animation: slideupChat 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+@keyframes slideupChat {
+    0% { opacity: 0; transform: translateY(50px);}
+    100% { opacity: 1; transform: translateY(0);}
+}
+.mission-chat-header {
+    background: linear-gradient(90deg, #f39200 0%, #95c11f 100%);
+    color: #171718;
+    font-weight: 800;
+    font-size: 1.1rem;
+    padding: 12px 16px 12px 18px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.mission-chat-close {
+    background: #fff;
+    border: 2px solid #f39200;
+    color: #f39200;
+    font-size: 1.7rem;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    margin-left: 8px;
+}
+.mission-chat-close:hover {
+    background: #f39200;
+    color: #fff;
+    border-color: #95c11f;
+    box-shadow: 0 2px 6px #95c11f33;
+}
+.mission-chat-body {
+    flex: 1;
+    padding: 18px 15px 12px 15px;
+    overflow-y: auto;
+    background: #fff;
+    border-bottom: 1px solid #f39200;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 80px;
+    max-height: 250px;
+}
+.mission-chat-message {
+    max-width: 82%;
+    padding: 9px 14px;
+    border-radius: 18px;
+    font-size: 1rem;
+    line-height: 1.3;
+    word-break: break-word;
+    box-shadow: 0 2px 10px #17171811;
+    margin-bottom: 3px;
+    display: inline-block;
+}
+.mission-chat-message.qg {
+    background: linear-gradient(90deg, #f39200 60%, #95c11f 100%);
+    color: #fff;
+    margin-right: auto;
+    border-bottom-left-radius: 0;
+    border: 2px solid #f39200;
+    box-shadow: 0 2px 8px #f3920033;
+}
+.mission-chat-message.user {
+    background: #fff;
+    color: #171718;
+    margin-left: auto;
+    border-bottom-right-radius: 0;
+    border: 2px solid #95c11f;
+    box-shadow: 0 2px 8px #95c11f22;
+}
+.mission-chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 12px 15px;
+    background: #fff;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+#missionChatText {
+    flex: 1;
+    border: 2px solid #171718;
+    border-radius: 14px;
+    padding: 8px 13px;
+    font-size: 1rem;
+    font-family: inherit;
+    outline: none;
+    transition: border 0.2s;
+}
+#missionChatText:focus {
+    border-color: #f39200;
+}
+.mission-chat-input button[type="submit"] {
+    background: linear-gradient(90deg, #f39200 60%, #95c11f 100%);
+    color: #fff;
+    font-weight: 700;
+    border: none;
+    border-radius: 14px;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s, transform 0.2s;
+}
+.mission-chat-input button[type="submit"]:hover {
+    background: linear-gradient(90deg, #95c11f 10%, #f39200 90%);
+    transform: scale(1.05);
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hqBuilding = document.getElementById('hqBuilding');
+    const missionChat = document.getElementById('missionChat');
+    const closeChatBtn = document.getElementById('closeMissionChat');
+    const chatBody = document.getElementById('missionChatBody');
+    const chatForm = document.getElementById('missionChatForm');
+    const chatInput = document.getElementById('missionChatText');
+
+    hqBuilding.addEventListener('click', () => {
+        missionChat.style.display = 'flex';
+        setTimeout(() => { chatInput.focus(); }, 350);
+    });
+
+    closeChatBtn.addEventListener('click', () => {
+        missionChat.style.display = 'none';
+        chatInput.value = '';
+    });
+
+    chatForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+        // Bulle utilisateur
+        const userMsg = document.createElement('div');
+        userMsg.className = 'mission-chat-message user';
+        userMsg.textContent = msg;
+        chatBody.appendChild(userMsg);
+        chatInput.value = '';
+        chatBody.scrollTop = chatBody.scrollHeight;
+        // Réponse QG simple
+        setTimeout(() => {
+            const qgMsg = document.createElement('div');
+            qgMsg.className = 'mission-chat-message qg';
+            // Réponse basique : orienter vers stand Mission Locale
+            qgMsg.textContent = "👋 Merci pour ton message ! Retrouve-nous au stand Mission Locale pour une vraie discussion et des conseils personnalisés. 😊";
+            chatBody.appendChild(qgMsg);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }, 600);
+    });
+});
+</script>
+<!-- ... (fin du fichier inchangé) ... -->
                         <div class="hq-flag">🏠</div>
                         <h3 data-fr="QUARTIER GÉNÉRAL" data-es="CUARTEL GENERAL">QUARTIER GÉNÉRAL</h3>
                         <h4 data-fr="Mission Locale" data-es="Misión Local">Mission Locale</h4>
