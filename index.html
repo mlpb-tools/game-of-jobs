@@ -2147,16 +2147,29 @@
                     <div class="hq-building">
                         <!-- ... (tout le reste du fichier inchangé) ... -->
 <div class="headquarters">
-    <div class="hq-building" id="hqBuilding">
-        <div class="hq-flag">🏳️‍🌈</div>
-        <h3>QG Mission Locale</h3>
-        <h4>Accompagnement & Infos</h4>
-        <div class="hq-services">
-            <span>🗣️ Orientation</span>
-            <span>💼 Coaching Emploi</span>
-            <span>📄 Conseils CV & Lettre</span>
+    <div class="hq-services">
+    <span>🗣️ Orientation</span>
+    <span>💼 Coaching Emploi</span>
+    <span>📄 Conseils CV & Lettre</span>
+    <!-- Instructions interactives -->
+    <div class="hq-interactive">
+        <label style="display:flex;align-items:center;gap:8px;">
+            <input type="checkbox" id="presenceCheck">
+            ✅ Signer la feuille de présence et prendre les conseils (+10 pts)
+        </label>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+            📌 Noter les 3 secteurs ciblés (+10 pts)
+            <input type="text" id="secteursInput" placeholder="Ex: Santé, Tech, Resto" style="flex:1;"/>
+            <button type="button" id="secteursValider">Valider</button>
+        </div>
+        <div style="margin-top:10px;display:flex;align-items:center;gap:8px;">
+            🎤 Débrief à chaud au retour QG (+20 pts)
+            <button type="button" id="debriefBtn">Débrief</button>
         </div>
     </div>
+</div>
+<!-- Badge score -->
+<div id="hqScoreBadge" class="hq-score-badge">0 pts</div>
     <!-- Ajout du chat QG -->
     <div class="mission-chat-window" id="missionChat" style="display:none;">
         <div class="mission-chat-header">
