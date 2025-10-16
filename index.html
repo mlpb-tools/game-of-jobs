@@ -6,6 +6,304 @@
     <title>Escape Game Pro – Mission Forum</title>
     <link href="https://fonts.googleapis.com/css2?family=Muli:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
+        #hqBlock {
+  background: linear-gradient(135deg, #f39200 30%, #d60b52 100%);
+  border: 5px solid #171718;
+  border-radius: 0 40px 35px 0 / 45px 0 40px 12px;
+  clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+  box-shadow: 8px 8px 0px #171718;
+  padding: 38px 32px 32px 32px;
+  min-width: 340px;
+  max-width: 420px;
+  margin: 0 auto 45px auto;
+  position: relative;
+}
+.hq-title {
+  font-family: 'Muli', Arial, sans-serif;
+  font-weight: 900;
+  font-size: 1.45rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #fff;
+  margin-bottom: 18px;
+  text-shadow: 2px 2px 8px #17171855;
+}
+.hq-score-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #95c11f;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.2rem;
+  padding: 8px 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px #95c11f44;
+  z-index: 10;
+}
+.hq-interactive input[type="text"] {
+  border: 2px solid #95c11f;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1rem;
+}
+.hq-interactive button {
+  background: linear-gradient(90deg,#95c11f 60%,#f39200 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  padding: 7px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.hq-interactive button:hover {
+  background: linear-gradient(90deg,#f39200 10%,#95c11f 90%);
+}
+.chat-launch-btn {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
+  background: #fff;
+  border: 2px solid #f39200;
+  color: #f39200;
+  font-size: 1.07rem;
+  border-radius: 50px;
+  font-weight: bold;
+  padding: 7px 20px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.25s;
+  z-index: 12;
+}
+.chat-launch-btn:hover {
+  background: #95c11f;
+  color: #fff;
+  border-color: #95c11f;
+}
+/* Chat Mission Locale */
+.mission-chat-window {
+  position: fixed;
+  bottom: 35px;
+  right: 35px;
+  width: 340px;
+  max-width: 97vw;
+  background: #fff;
+  border: 3px solid #171718;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(40, 151, 213, 0.13), 0 2px 8px #f39200;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Muli', Arial, sans-serif;
+  animation: slideupChat 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+@keyframes slideupChat {
+  0% { opacity: 0; transform: translateY(50px);}
+  100% { opacity: 1; transform: translateY(0);}
+}
+.mission-chat-header {
+  background: linear-gradient(90deg, #f39200 0%, #95c11f 100%);
+  color: #171718;
+  font-weight: 800;
+  font-size: 1.1rem;
+  padding: 12px 16px 12px 18px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mission-chat-close {
+  background: #fff;
+  border: 2px solid #f39200;
+  color: #f39200;
+  font-size: 1.7rem;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  margin-left: 8px;
+}
+.mission-chat-close:hover {
+  background: #f39200;
+  color: #fff;
+  border-color: #95c11f;
+  box-shadow: 0 2px 6px #95c11f33;
+}
+.mission-chat-body {
+  flex: 1;
+  padding: 18px 15px 12px 15px;
+  overflow-y: auto;
+  background: #fff;
+  border-bottom: 1px solid #f39200;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 80px;
+  max-height: 250px;
+}
+.mission-chat-message {
+  max-width: 82%;
+  padding: 9px 14px;
+  border-radius: 18px;
+  font-size: 1rem;
+  line-height: 1.3;
+  word-break: break-word;
+  box-shadow: 0 2px 10px #17171811;
+  margin-bottom: 3px;
+  display: inline-block;
+}
+.mission-chat-message.qg {
+  background: linear-gradient(90deg, #f39200 60%, #95c11f 100%);
+  color: #fff;
+  margin-right: auto;
+  border-bottom-left-radius: 0;
+  border: 2px solid #f39200;
+  box-shadow: 0 2px 8px #f3920033;
+}
+.mission-chat-message.user {
+  background: #fff;
+  color: #171718;
+  margin-left: auto;
+  border-bottom-right-radius: 0;
+  border: 2px solid #95c11f;
+  box-shadow: 0 2px 8px #95c11f22;
+}
+.mission-chat-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px 15px;
+  background: #fff;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+#missionChatText {
+  flex: 1;
+  border: 2px solid #171718;
+  border-radius: 14px;
+  padding: 8px 13px;
+  font-size: 1rem;
+  font-family: inherit;
+  outline: none;
+  transition: border 0.2s;
+}
+#missionChatText:focus {
+  border-color: #f39200;
+}
+.mission-chat-input button[type="submit"] {
+  background: linear-gradient(90deg, #f39200 60%, #95c11f 100%);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 14px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s, transform 0.2s;
+}
+.mission-chat-input button[type="submit"]:hover {
+  background: linear-gradient(90deg, #95c11f 10%, #f39200 90%);
+  transform: scale(1.05);
+}
+</style>
+    <script>
+let scoreTotal = 0;
+const scoreBadge = document.getElementById("hqScoreBadge");
+const presenceCheck = document.getElementById("presenceCheck");
+const secteursInput = document.getElementById("secteursInput");
+const secteursValider = document.getElementById("secteursValider");
+const debriefBtn = document.getElementById("debriefBtn");
+
+// Pour éviter de compter plusieurs fois
+let presenceAdded = false;
+let secteursAdded = false;
+let debriefAdded = false;
+
+function updateScore() {
+    scoreBadge.textContent = scoreTotal + " pts";
+}
+
+// Feuille de présence
+presenceCheck.addEventListener("change", function() {
+    if (presenceCheck.checked && !presenceAdded) {
+        scoreTotal += 10;
+        presenceAdded = true;
+        updateScore();
+    } else if (!presenceCheck.checked && presenceAdded) {
+        scoreTotal -= 10;
+        presenceAdded = false;
+        updateScore();
+    }
+});
+
+// Validation secteurs ciblés
+secteursValider.addEventListener("click", function() {
+    if (secteursInput.value.trim() !== "" && !secteursAdded) {
+        scoreTotal += 10;
+        secteursAdded = true;
+        updateScore();
+        secteursInput.disabled = true;
+        secteursValider.disabled = true;
+    }
+});
+
+// Débrief
+debriefBtn.addEventListener("click", function() {
+    if (!debriefAdded) {
+        scoreTotal += 20;
+        debriefAdded = true;
+        updateScore();
+        alert("Bravo, mission accomplie !");
+        debriefBtn.disabled = true;
+    }
+});
+
+// Affichage initial
+updateScore();
+
+// Chat Mission Locale
+const hqBlock = document.getElementById('hqBlock');
+const missionChat = document.getElementById('missionChat');
+const closeChatBtn = document.getElementById('closeMissionChat');
+const chatBody = document.getElementById('missionChatBody');
+const chatForm = document.getElementById('missionChatForm');
+const chatInput = document.getElementById('missionChatText');
+const openChatBtn = document.getElementById('openMissionChat');
+
+openChatBtn.addEventListener('click', () => {
+    missionChat.style.display = 'flex';
+    setTimeout(() => { chatInput.focus(); }, 350);
+});
+
+closeChatBtn.addEventListener('click', () => {
+    missionChat.style.display = 'none';
+    chatInput.value = '';
+});
+
+chatForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const msg = chatInput.value.trim();
+    if (!msg) return;
+    // Bulle utilisateur
+    const userMsg = document.createElement('div');
+    userMsg.className = 'mission-chat-message user';
+    userMsg.textContent = msg;
+    chatBody.appendChild(userMsg);
+    chatInput.value = '';
+    chatBody.scrollTop = chatBody.scrollHeight;
+    // Réponse QG simple
+    setTimeout(() => {
+        const qgMsg = document.createElement('div');
+        qgMsg.className = 'mission-chat-message qg';
+        // Réponse basique : orienter vers stand Mission Locale
+        qgMsg.textContent = "👋 Merci pour ton message ! Retrouve-nous au stand Mission Locale pour une vraie discussion et des conseils personnalisés. 😊";
+        chatBody.appendChild(qgMsg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }, 600);
+});
+</script>
         body {
             box-sizing: border-box;
             margin: 0;
