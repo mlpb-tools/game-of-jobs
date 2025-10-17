@@ -1,16 +1,310 @@
 mon-app/
 ├─ index.html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Serious Game Pro</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="header">
+    <h1>💼 SERIOUS GAME PROFESSIONNEL</h1>
+    <p>Forum de l'Emploi - Réseau des Missions Locales</p>
+  </header>
+
+  <nav class="navigation">
+    <a class="nav-btn" href="#/map">🗺️ Carte Interactive</a>
+    <a class="nav-btn" href="#/rules">📋 Règles & Badges</a>
+    <a class="nav-btn" href="#/progress">📊 Suivi Parcours</a>
+    <a class="nav-btn" href="#/questions">💬 Aide Discussion</a>
+    <a class="nav-btn" href="#/rewards">🏆 Bilan</a>
+  </nav>
+
+  <main id="app" aria-live="polite"></main>
+
+  <!-- Modal global (note: body = DIV pour supporter du HTML riche) -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalTitle"></h3>
+      <div id="modalBody"></div>
+      <button class="btn-primary" onclick="closeModal()">Fermer</button>
+    </div>
+  </div>
+
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/router.js"></script>
+</body>
+</html>
 ├─ assets/
 │  ├─ css/
 │  │  └─ styles.css
 │  └─ js/
 │     ├─ router.js
+// assets/js/router.js
+
+const routes = {
+  '/':         'views/map.html',      // Page 1 : Carte interactive
+  '/map':      'views/map.html',
+  '/rules':    'views/rules.html',    // Page 2
+  '/progress': 'views/progress.html', // Page 3
+  '/questions':'views/questions.html',// Page 4
+  '/rewards':  'views/rewards.html',  // Page 5
+};
+
+async function render() {
+  const path = location.hash.replace('#','') || '/';
+  const file = routes[path] || routes['/'];
+
+  // Charge la vue
+  const html = await fetch(file, { cache: 'no-cache' }).then(r => r.text());
+  const app = document.getElementById('app');
+  app.innerHTML = html;
+
+  // Active le bouton courant
+  document.querySelectorAll('.nav-btn').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === `#${path}`);
+  });
+
+  // UX / Accessibilité
+  const titles = { '/':'Carte', '/map':'Carte', '/rules':'Règles', '/progress':'Suivi', '/questions':'Questions', '/rewards':'Bilan' };
+  document.title = `Serious Game — ${titles[path] || 'Carte'}`;
+  app.setAttribute('tabindex','-1'); app.focus(); window.scrollTo(0,0);
+
+  // Hooks d’init par page
+  if (path === '/map' || path === '/') window.initMapPage?.();
+  if (path === '/rules') window.initRulesPage?.();
+  if (path === '/progress') window.initProgressPage?.();
+  if (path === '/questions') window.initQuestionsPage?.();
+  if (path === '/rewards') window.initRewardsPage?.();
+
+  // Synchronise l'affichage du score si présent
+  if (document.getElementById('totalScore')) {
+    document.getElementById('totalScore').textContent = window.__score ?? 0;
+  }
+}
+
+addEventListener('hashchange', render);
+addEventListener('load', render);
+
 │     ├─ app.js
+// assets/js/app.js
+
+// === Etat global minimal ===
+window.__score = 0;
+
+// === MODAL global ===
+function showModal(title, html) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = html; // HTML riche
+  document.getElementById('modal').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+// === Navigation helper (remplace showPage(...)) ===
+function goto(path) { location.hash = `#/${path}`; }
+
+// === Score helper ===
+function updateScore(delta = 0) {
+  window.__score = Math.max(0, (window.__score ?? 0) + delta);
+  const el = document.getElementById('totalScore');
+  if (el) el.textContent = window.__score;
+}
+
+// === Page 1 : Carte interactive ===
+function openSector(sectorId) {
+  // TODO: remplace ce contenu par ta vraie logique d’ouverture de secteur / offres / entreprises
+  const content = `
+    <div class="card">
+      <p>Tu as ouvert le secteur <b>${sectorId}</b>.</p>
+      <div class="row">
+        <button class="btn-primary" onclick="updateScore(10)">+10 points</button>
+        <button class="btn-secondary" onclick="closeModal()">Fermer</button>
+      </div>
+    </div>
+  `;
+  showModal('Secteur', content);
+}
+window.initMapPage = function() {
+  // Si tu as des listeners spécifiques à recâbler, fais-le ici.
+  // Exemple : document.querySelector('#sector_logistique')?.addEventListener('click', ()=>openSector('logistique'));
+};
+
+// === Page 2 : Règles ===
+window.initRulesPage = function() {
+  // Logique spécifique éventuelle
+};
+
+// === Page 3 : Suivi ===
+window.initProgressPage = function() {
+  // Exemple : animer la barre de progression si besoin
+  const fill = document.getElementById('progressFill');
+  if (fill) {
+    const w = fill.style.width || '60%';
+    fill.style.width = '0%';
+    setTimeout(()=> fill.style.width = w, 10);
+  }
+  // Synchronise le score affiché
+  const scoreEl = document.getElementById('totalScore');
+  if (scoreEl) scoreEl.textContent = window.__score ?? 0;
+};
+
+// === Page 4 : Questions / Chat ===
+function sendMessage() {
+  const input = document.getElementById('userMessage');
+  if (!input) return;
+  const msg = (input.value || '').trim();
+  if (!msg) return;
+
+  const container = document.getElementById('chatMessages');
+  if (!container) return;
+
+  container.insertAdjacentHTML('beforeend', `<div class="message user">${msg}</div>`);
+  container.insertAdjacentHTML('beforeend', `<div class="message bot">Merci ! Un conseiller te répondra bientôt.</div>`);
+  input.value = '';
+  container.scrollTop = container.scrollHeight;
+}
+window.sendMessage = sendMessage; // pour l'attribut onclick dans ta vue
+window.initQuestionsPage = function() {
+  // Optionnel : écoute "Enter" sur l'input
+  const input = document.getElementById('userMessage');
+  if (input) {
+    input.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter') sendMessage();
+    });
+  }
+};
+
+// === Page 5 : Récompenses ===
+window.initRewardsPage = function() {
+  const final = document.getElementById('finalScore');
+  if (final) final.textContent = window.__score ?? 0;
+};
+
 │     └─ pages/
-│        └─ map.js   (facultatif, si tu veux isoler le JS de la carte)
+│        └─ map.js
 └─ views/
    ├─ map.html
+<section id="map" class="page active">
+
+  <div class="header-section">
+    <h2>🎯 Trouve ton job !</h2>
+    <p>Explore les secteurs, découvre les entreprises et décroche ton emploi !</p>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" onclick="showModal('Mon CV', 'Fonction à venir')">📄 Mon CV</button>
+    <button class="btn-secondary" onclick="showModal('Chat Mission Locale', 'Système de messagerie à venir')">💬 Chat Mission Locale</button>
+  </div>
+
+  <div id="sector-map" class="map-container">
+    <!-- Blocs secteur : adaptables à ton design -->
+    <div class="sector" id="sector_logistique" onclick="openSector('logistique')">🚚 Logistique</div>
+    <div class="sector" id="sector_sante" onclick="openSector('sante')">🧑‍⚕️ Santé</div>
+    <div class="sector" id="sector_ess" onclick="openSector('ess')">🤝 ESS & Social</div>
+    <div class="sector" id="sector_environnement" onclick="openSector('environnement')">🌱 Environnement</div>
+    <div class="sector" id="sector_services" onclick="openSector('services')">🧰 Services</div>
+    <div class="sector" id="sector_numerique" onclick="openSector('numerique')">💻 Numérique</div>
+    <div class="sector" id="sector_apprentissage" onclick="openSector('apprentissage')">🎓 Apprentissage</div>
+    <div class="sector" id="sector_interim" onclick="openSector('interim')">⏱️ Intérim</div>
+  </div>
+
+  <div id="scoreboard">
+    <p><strong>Score total :</strong> <span id="totalScore">0</span> points</p>
+  </div>
+
+</section>
+
    ├─ rules.html
+<!-- PAGE 2 – RÈGLES & BADGES -->
+<section id="rules" class="page">
+  <h2>📋 Règles & Badges</h2>
+  <p>Bienvenue dans la zone des règles ! Gagne des points en explorant les secteurs, en découvrant des entreprises, et en répondant aux quiz.</p>
+
+  <ul class="rules-list">
+    <li>🧭 <strong>Explore</strong> les secteurs pour débloquer de nouvelles opportunités.</li>
+    <li>💬 <strong>Interagis</strong> avec les entreprises pour en apprendre plus sur leurs métiers.</li>
+    <li>🎯 <strong>Postule</strong> pour accumuler des points et obtenir des badges de progression.</li>
+    <li>🏆 <strong>Débloque</strong> des récompenses à mesure que tu progresses !</li>
+  </ul>
+
+  <div class="badges-section">
+    <h3>🏅 Tes Badges</h3>
+    <div class="badges-grid">
+      <div class="badge">🎓 Premier entretien</div>
+      <div class="badge">💼 Premier emploi</div>
+      <div class="badge">🌍 Mobilité réussie</div>
+      <div class="badge">🚀 Autonomie pro</div>
+    </div>
+  </div>
+
+  <button class="btn-secondary" onclick="goto('map')">⬅️ Retour au QG</button>
+</section>
    ├─ progress.html
+<section id="progress" class="page">
+  <h2>📊 Suivi de ton parcours</h2>
+  <p>Visualise ta progression et ton score global !</p>
+
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div id="progressFill" style="width:60%"></div>
+    </div>
+    <p><strong>60 %</strong> de ton parcours complété</p>
+  </div>
+
+  <div class="stats">
+    <p>Points obtenus : <span id="totalScore">0</span></p>
+    <p>Entreprises découvertes : <span id="companiesDiscovered">0</span></p>
+    <p>Offres consultées : <span id="offersViewed">0</span></p>
+  </div>
+
+  <button class="btn-primary" onclick="showModal('Statistiques détaillées', 'Fonctionnalité à venir')">📈 Voir plus</button>
+  <button class="btn-secondary" onclick="goto('map')">⬅️ Retour au QG</button>
+</section>
+
    ├─ questions.html
+<section id="questions" class="page">
+  <h2>💬 Questions / Aide</h2>
+  <p>Pose une question, un conseiller de la Mission Locale pourra te répondre directement.</p>
+
+  <div class="chat-box">
+    <div class="chat-messages" id="chatMessages">
+      <div class="message system">Bienvenue ! Pose ta question ci-dessous 👇</div>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="userMessage" placeholder="Écris ton message ici..." />
+      <button onclick="sendMessage()">Envoyer</button>
+    </div>
+  </div>
+
+  <button class="btn-secondary" onclick="goto('map')">⬅️ Retour au QG</button>
+</section>
+
    └─ rewards.html
+<section id="rewards" class="page">
+  <h2>🏆 Récompenses & Bilan</h2>
+  <p>Bravo ! Voici ton récapitulatif et les récompenses obtenues.</p>
+
+  <div class="summary">
+    <p><strong>Score final :</strong> <span id="finalScore">120</span> points</p>
+    <p><strong>Badges débloqués :</strong> 3 / 4</p>
+  </div>
+
+  <div class="rewards-gallery">
+    <div class="reward unlocked">🎓 Badge “Premier entretien”</div>
+    <div class="reward unlocked">🚀 Badge “Autonomie pro”</div>
+    <div class="reward unlocked">🌍 Badge “Mobilité réussie”</div>
+    <div class="reward locked">🔒 Badge “Expert métier”</div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-primary" onclick="goto('map')">🔁 Rejouer</button>
+    <button class="btn-secondary" onclick="showModal('Partager', 'Lien de partage à venir')">📤 Partager</button>
+  </div>
+</section>
+
+
