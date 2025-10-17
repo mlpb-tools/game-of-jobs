@@ -1,0 +1,16 @@
+mon-app/
+├─ index.html
+├─ assets/
+│  ├─ css/
+│  │  └─ styles.css
+│  └─ js/
+│     ├─ router.js
+│     ├─ app.js
+│     └─ pages/
+│        └─ map.js   (facultatif, si tu veux isoler le JS de la carte)
+└─ views/
+   ├─ map.html
+   ├─ rules.html
+   ├─ progress.html
+   ├─ questions.html
+   └─ rewards.html
